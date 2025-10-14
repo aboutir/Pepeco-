@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Portefeuille PEPECO</title>
+<style>
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #c00000;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+  }
+  .container {
+    background: rgba(255,255,255,0.12);
+    padding: 20px 25px;
+    border-radius: 20px;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 0 30px rgba(0,0,0,0.5);
+  }
+  h1 {
+    text-align: center;
+    font-weight: 700;
+    font-size: 1.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 20px;
+    text-shadow: 0 0 8px rgba(0,0,0,0.3);
+    user-select: none;
+  }
+  label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  input, select, button {
+    width: 100%;
+    padding: 10px 12px;
+    margin-bottom: 16px;
+    border-radius: 10px;
+    border: none;
+    color: white;
+    background-color: rgba(255,255,255,0.3);
+    font-weight: 600;
+    font-size: 1rem;
+    outline: none;
+    transition: background-color 0.3s;
+  }
+  input::placeholder {
+    color: #eaeaea;
+  }
+  input:focus, select:focus {
+    background-color: rgba(255,255,255,0.6);
+    color: #c00000;
+  }
+  #formatInfo {
+    color: #b1ffd2;
+    font-weight: 500;
+    font-size: 0.9rem;
+    text-align: center;
+    margin-top: -12px;
+    margin-bottom: 12px;
+    min-height: 1.4em;
+  }
+  #message {
+    color: #ffdede;
+    text-align: center;
+    font-weight: 600;
+    min-height: 1.3em;
+    margin-bottom: 10px;
+  }
+  button {
+    font-weight: bold;
+    background-color: white;
+    color: #c00000;
+    cursor: pointer;
+    border-radius: 12px;
+  }
+  button:hover {
+    background-color: #f0f0f0;
+  }
+</style>
+</head>
+<body>
+
+<div class="container" role="main" aria-label="Formulaire portefeuille">
+<h1>Portefeuille</h1>
+
+<div id="message" aria-live="polite"></div>
+
+<form id="walletForm" autocomplete="off" novalidate>
+  <label for="ownerName">Nom du propriétaire du compte</label>
+  <input type="text" id="ownerName" name="ownerName" placeholder="Jean Dupont" required />
+
+  <label for="indicatif">Indicatif téléphonique</label>
+  <input list="indicatifs" id="indicatif" name="indicatif" placeholder="225" required autocomplete="off" />
+  <datalist id="indicatifs">
+    <option value="221"></option>
+    <option value="223"></option>
+    <option value="225"></option>
+    <option value="226"></option>
+    <option value="228"></option>
+    <option value="229"></option>
+  </datalist>
+
+  <div id="formatInfo" aria-live="polite"></div>
+
+  <label for="phoneNumber">Numéro de retrait (sans indicatif)</label>
+  <input type="text" id="phoneNumber" name="phoneNumber" placeholder="XXXXXXXX" pattern="\d+" inputmode="numeric" required />
+
+  <label for="withdrawalPass">Mot de passe de retrait</label>
+  <input type="password" id="withdrawalPass" name="withdrawalPass" placeholder="Votre mot de passe" required />
+
+  <label for="operatorSelector" id="operatorSelector" tabindex="0" 
+    aria-expanded="false" aria-haspopup="listbox" role="button"
+    style="background: rgba(255,255,255,0.3); padding: 10px; border-radius:10px; cursor:pointer; color:white; font-weight:600;">
+    MTN <span style="float:right;">&#9662;</span>
+  </label>
+  <input type="hidden" id="operator" name="operator" value="MTN" />
+
+  <button type="button" id="submitBtn">Valider</button>
+</form>
+</div>
+
+<!-- Modal opérateur -->
+<div id="overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999;"></div>
+<div id="bottomSheet" role="listbox" aria-label="Sélection opérateur" style="display:none; position:fixed; bottom:0; left:0; width:100%; background:#fff; color:#c00000; border-radius:12px 12px 0 0; padding:14px 16px; max-height:320px; overflow-y:auto; z-index:10000;">
+  <div tabindex="0" class="operator selected" data-operator="MTN" style="padding:10px; border-bottom:1px solid #ddd; cursor:pointer;">MTN Money</div>
+  <div tabindex="0" class="operator" data-operator="Wave" style="padding:10px; border-bottom:1px solid #ddd; cursor:pointer;">Wave</div>
+  <div tabindex="0" class="operator" data-operator="Orange Money" style="padding:10px; border-bottom:1px solid #ddd; cursor:pointer;">Orange Money</div>
+  <div tabindex="0" class="operator" data-operator="Moov" style="padding:10px; border-bottom:1px solid #ddd; cursor:pointer;">Moov</div>
+  <div tabindex="0" class="operator" data-operator="Flooz Money" style="padding:10px; cursor:pointer;">Flooz Money</div>
+  <div style="text-align:right; margin-top:10px;">
+    <button id="cancelBtn" type="button" style="border:none; padding:8px 16px; border-radius:12px; background:#eee; color:#c00000; cursor:pointer;">Annuler</button>
+    <button id="confirmBtn" type="button" style="border:none; padding:8px 16px; border-radius:12px; background:#c00000; color:#fff; cursor:pointer; margin-left:8px;">Confirmer</button>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+  import {
+    getAuth,
+    onAuthStateChanged,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword
+  } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+  import {
+    getDatabase,
+    ref,
+    get,
+    set,
+    update,
+    onValue,
+    runTransaction,
+    query,
+    orderByChild,
+    equalTo
+  } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+
+  // 🔥 Configuration Firebase (PEPECO)
+  const firebaseConfig = {
+    apiKey: "AIzaSyCaDZQUirunG7CPrMISasgBVlVgkyuISko",
+    authDomain: "pepeco-f6f26.firebaseapp.com",
+    databaseURL: "https://pepeco-f6f26-default-rtdb.firebaseio.com",
+    projectId: "pepeco-f6f26",
+    storageBucket: "pepeco-f6f26.firebasestorage.app",
+    messagingSenderId: "175958489677",
+    appId: "1:175958489677:web:48b339d732e4207d0f7a04"
+  };
+  
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const auth = getAuth(app);
+
+document.addEventListener('DOMContentLoaded', () => {
+  const indicatifInput = document.getElementById('indicatif');
+  const phoneInput = document.getElementById('phoneNumber');
+  const formatInfo = document.getElementById('formatInfo');
+  const operatorSelector = document.getElementById('operatorSelector');
+  const bottomSheet = document.getElementById('bottomSheet');
+  const overlay = document.getElementById('overlay');
+  const cancelBtn = document.getElementById('cancelBtn');
+  const confirmBtn = document.getElementById('confirmBtn');
+  const operatorInput = document.getElementById('operator');
+  const submitBtn = document.getElementById('submitBtn');
+  const messageDiv = document.getElementById('message');
+
+  // 📱 Formats téléphoniques simples 2025
+  const countryFormats = {
+    "225": { length: 10, text: "📱 Côte d’Ivoire → +225 XX XX XX XX XX (10 chiffres)\nExemple : 0564569650" },
+    "223": { length: 8, text: "📱 Mali → +223 XX XX XX XX (8 chiffres)" },
+    "221": { length: 9, text: "📱 Sénégal → +221 X XX XXX XXX (9 chiffres)" },
+    "228": { length: 8, text: "📱 Togo → +228 XX XX XX XX (8 chiffres)" },
+    "226": { length: 8, text: "📱 Burkina Faso → +226 XX XX XX XX (8 chiffres)" },
+    "229": { length: 8, text: "📱 Bénin → +229 XX XX XX XX (8 chiffres)" }
+  };
+
+  // 🔁 Affichage du format selon l’indicatif choisi
+  function updateFormat() {
+    const indicatif = indicatifInput.value.trim();
+    if (countryFormats[indicatif]) {
+      const info = countryFormats[indicatif];
+      formatInfo.textContent = info.text;
+      phoneInput.maxLength = info.length;
+      phoneInput.placeholder = "Ex: " + "0".repeat(info.length);
+    } else {
+      formatInfo.textContent = "";
+      phoneInput.removeAttribute('maxLength');
+      phoneInput.placeholder = "Entrez votre numéro";
+    }
+  }
+
+  indicatifInput.addEventListener('input', updateFormat);
+  updateFormat();
+
+  // 🔽 Sélection opérateur
+  let currentSelection = 'MTN';
+  let tempSelection = 'MTN';
+
+  function openBottomSheet() {
+    bottomSheet.style.display = 'block';
+    overlay.style.display = 'block';
+    bottomSheet.setAttribute('aria-hidden', 'false');
+    overlay.setAttribute('aria-hidden', 'false');
+    operatorSelector.setAttribute('aria-expanded', 'true');
+    tempSelection = currentSelection;
+    bottomSheet.querySelectorAll('.operator').forEach(el => {
+      const selected = el.dataset.operator === tempSelection;
+      el.classList.toggle('selected', selected);
+      el.setAttribute('aria-selected', selected.toString());
+    });
+  }
+
+  function closeBottomSheet() {
+    bottomSheet.style.display = 'none';
+    overlay.style.display = 'none';
+    bottomSheet.setAttribute('aria-hidden', 'true');
+    overlay.setAttribute('aria-hidden', 'true');
+    operatorSelector.setAttribute('aria-expanded', 'false');
+  }
+
+  function confirmSelection() {
+    currentSelection = tempSelection;
+    operatorSelector.innerHTML = currentSelection + ' <span style="float:right;">&#9662;</span>';
+    operatorInput.value = currentSelection;
+    closeBottomSheet();
+  }
+
+  operatorSelector.addEventListener('click', openBottomSheet);
+  overlay.addEventListener('click', closeBottomSheet);
+  cancelBtn.addEventListener('click', closeBottomSheet);
+  confirmBtn.addEventListener('click', confirmSelection);
+
+  bottomSheet.querySelectorAll('.operator').forEach(el => {
+    el.addEventListener('click', () => {
+      bottomSheet.querySelectorAll('.operator').forEach(o => o.classList.remove('selected'));
+      el.classList.add('selected');
+      tempSelection = el.dataset.operator;
+    });
+  });
+
+  // ✅ Validation
+  function showMessage(text, isError = true) {
+    messageDiv.textContent = text;
+    messageDiv.style.color = isError ? '#ffdede' : '#b1ffd1';
+    setTimeout(() => {
+      messageDiv.textContent = '';
+    }, 4000);
+  }
+
+  function validateForm() {
+    const owner = document.getElementById('ownerName').value.trim();
+    const indicatif = indicatifInput.value.trim();
+    const phone = phoneInput.value.trim();
+    const pass = document.getElementById('withdrawalPass').value.trim();
+    const operator = operatorInput.value.trim();
+
+    if (!owner) {
+      showMessage('Le nom du propriétaire est requis');
+      return false;
+    }
+    if (!(indicatif in countryFormats)) {
+      showMessage('Indicatif pays invalide');
+      return false;
+    }
+    if (!/^\d+$/.test(phone)) {
+      showMessage('Le numéro doit contenir uniquement des chiffres');
+      return false;
+    }
+    const expectedLength = countryFormats[indicatif].length;
+    if (phone.length !== expectedLength) {
+      showMessage(`Le numéro doit avoir ${expectedLength} chiffres`);
+      return false;
+    }
+    if (!pass) {
+      showMessage('Le mot de passe de retrait est requis');
+      return false;
+    }
+    if (pass.length < 4) {
+      showMessage('Le mot de passe doit contenir au moins 4 caractères');
+      return false;
+    }
+    if (!operator) {
+      showMessage('Veuillez sélectionner un opérateur');
+      return false;
+    }
+    return true;
+  }
+
+  // 💾 Sauvegarde Firebase
+  async function saveConfig() {
+    if (!validateForm()) return;
+    const owner = document.getElementById('ownerName').value.trim();
+    const indicatif = indicatifInput.value.trim();
+    const phone = indicatif + phoneInput.value.trim();
+    const pass = document.getElementById('withdrawalPass').value.trim();
+    const operator = operatorInput.value.trim();
+
+    try {
+      const user = auth.currentUser;
+      if (!user) {
+        showMessage('Vous devez être connecté');
+        setTimeout(() => window.location.href = 'login.html', 2000);
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Enregistrement...';
+
+      await set(ref(db, `users/${user.uid}/withdrawalConfig`), {
+        ownerName: owner,
+        phone: phone,
+        operator: operator,
+        code: pass,
+        configuredAt: Date.now(),
+        lastUpdated: new Date().toISOString()
+      });
+
+      showMessage('Configuration enregistrée avec succès ✅', false);
+      document.getElementById('withdrawalPass').value = '';
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Valider';
+
+      setTimeout(() => window.location.href = 'carte.html', 2000);
+    } catch (error) {
+      console.error(error);
+      showMessage('Erreur lors de l’enregistrement ❌', true);
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Valider';
+    }
+  }
+
+  submitBtn.addEventListener('click', saveConfig);
+});
+</script>
+</body>
+</html>

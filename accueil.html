@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Page d'Accueil - PEPECO</title>
+  <style>
+    :root {
+      --red-bg: #d01818;
+      --red-bg-gradient: linear-gradient(135deg, #d01818, #a21010);
+      --green: #61B604;
+      --green-dark: #5aaf04;
+      --gray-light: #f1f3f5;
+      --gray-medium: #cacaca;
+      --white: #ffffff;
+      --radius: 16px;
+      --padding: 16px;
+      --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: var(--font-family);
+      background: var(--red-bg-gradient);
+      color: var(--white);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      padding-bottom: 62px; /* Espace pour la nav fixe */
+    }
+
+    /* Header compacte */
+    .header-image {
+      width: 100%;
+      height: 200px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: none;
+      user-select: none;
+      overflow: hidden;
+    }
+
+    .header-text {
+      position: static;
+      transform: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: var(--white);
+      font-weight: 400;
+      font-size: 14px;
+      letter-spacing: 0.15em;
+      text-shadow: 0 0 12px rgba(0,0,0,0.6);
+      gap: 12px;
+    }
+
+    .header-text img {
+      max-width: 300px;
+      height: auto;
+      display: block;
+    }
+
+    /* Card container */
+    .card-container {
+      display: flex;
+      gap: 12px;
+      padding: var(--padding);
+      justify-content: center;
+      background-color: rgba(255 255 255 / 0.15);
+      border-radius: var(--radius) var(--radius) 0 0;
+      user-select: none;
+    }
+
+    a.card {
+      background-color: rgba(255 255 255 / 0.9);
+      color: #000;
+      border-radius: var(--radius);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      flex: 1;
+      max-width: 130px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px 8px;
+      font-weight: 600;
+      text-decoration: none;
+      user-select: none;
+    }
+
+    a.card img {
+      width: 64px;
+      height: 64px;
+      object-fit: contain;
+      margin-bottom: 8px;
+    }
+
+    a.card .price {
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    a.card .subtitle {
+      font-size: 14px;
+      color: var(--green);
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    a.card:hover .subtitle,
+    a.card:hover {
+      text-decoration: underline;
+      color: var(--green);
+    }
+
+    /* Icons container */
+    .icon-container {
+      background-color: rgba(255 255 255 / 0.15);
+      padding: var(--padding);
+      display: flex;
+      justify-content: space-around;
+      border-radius: 0 0 var(--radius) var(--radius);
+      border-top: 1px solid rgba(255 255 255 / 0.3);
+      user-select: none;
+    }
+
+    a.icon-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: var(--white);
+      font-size: 12px;
+      width: 70px;
+      transition: color 0.3s ease;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    a.icon-item svg {
+      width: 28px;
+      height: 28px;
+      margin-bottom: 6px;
+      fill: var(--white);
+      transition: fill 0.3s ease;
+    }
+
+    a.icon-item:hover {
+      color: var(--green);
+    }
+
+    a.icon-item:hover svg {
+      fill: var(--green);
+    }
+
+    /* Jeux pour tous section */
+    .games-section {
+      padding: var(--padding);
+      user-select: none;
+    }
+
+    .section-title {
+      font-weight: 600;
+      margin-bottom: 12px;
+      font-size: 18px;
+      color: var(--white);
+    }
+
+    .games-list {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+
+    .game-item {
+      flex: 0 0 auto;
+      width: 90px;
+      height: 96px;
+      border-radius: var(--radius);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+      background-size: cover;
+      background-position: center;
+      cursor: pointer;
+      transition: transform 0.25s ease;
+    }
+
+    .game-item:hover {
+      transform: scale(1.1);
+    }
+
+    /* Bottom nav fixe */
+    nav.bottom-nav {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      z-index: 1000;
+      margin-top: auto;
+      display: flex;
+      background-color: var(--green);
+      color: var(--white);
+      font-weight: 700;
+      font-size: 16px;
+      border-radius: var(--radius) var(--radius) 0 0;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    nav.bottom-nav a {
+      flex: 1;
+      text-align: center;
+      padding: 14px 0;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      color: inherit;
+      text-decoration: none;
+    }
+
+    nav.bottom-nav a.active {
+      background-color: var(--white);
+      color: var(--green);
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+
+    nav.bottom-nav a:not(.active):hover {
+      background-color: #87d544;
+    }
+
+    nav.bottom-nav svg {
+      width: 24px;
+      height: 24px;
+      fill: currentColor;
+    }
+  </style>
+</head>
+<body>
+  <div class="header-image" aria-label="Image principale">
+    <div class="header-text" role="heading" aria-level="1">
+      Entrer
+      <img
+        src="https://image.noelshack.com/fichiers/2025/41/6/1760144371-pepco-horizontal.jpg"
+        alt="Un Nouveau Monde"
+      />
+    </div>
+  </div>
+
+  <section class="card-container" aria-label="Informations financières et service">
+    <a class="card" href="solde.html" role="group" aria-labelledby="solde-label">
+      <img alt="Balance" src="https://cdn-icons-png.flaticon.com/512/1828/1828817.png" />
+      <div class="price stat-value" id="solde-label">FCFA 0</div>
+      <div class="subtitle">Mon Solde</div>
+    </a>
+    <a class="card" href="#" role="group" aria-labelledby="revenus-label">
+      <img alt="Revenus" src="https://cdn-icons-png.flaticon.com/512/1089/1089846.png" />
+      <div class="price stat-value" id="revenus-label">FCFA 0</div>
+      <div class="subtitle">Revenus cumulés</div>
+    </a>
+    <a class="card" href="https://t.me/+80SyJAeh1rthYWM8" role="group" aria-labelledby="service-label">
+      <img alt="Service client" src="https://cdn-icons-png.flaticon.com/512/1041/1041838.png" />
+      <div class="subtitle" id="service-label" style="margin-top:22px; cursor:pointer;">
+        Groupe pepeco &gt;
+      </div>
+    </a>
+  </section>
+
+  <section class="icon-container" aria-label="Actions disponibles">
+    <a class="icon-item" href="recharger.html" aria-label="Recharger">
+      <svg viewBox="0 0 24 24"><path d="M13 5v4h3l-4 4-4-4h3V5h2zM5 13h14v2H5v-2z" /></svg>
+      Recharger
+    </a>
+    <a class="icon-item" href="retrait.html" aria-label="Retirer">
+      <svg viewBox="0 0 24 24"><path d="M16 13v-2H8v2h8zM16 19v-2H8v2h8zM16 7v-2H8v2h8z" /></svg>
+      Retirer
+    </a>
+    <a class="icon-item" href="bonus.html" aria-label="Pointage">
+      <svg viewBox="0 0 24 24"><path d="M12 7v5h4v-2h-2V7h-2zM3 17v1h18v-1H3zM21 3H3v3h18V3z" /></svg>
+      Échange de code 
+    </a>
+    <a class="icon-item" href="machine.html" aria-label="Centre de Tâches">
+      <svg viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zM4 5v2h16V5H4zm4 6h8v-2H8v2z" /></svg>
+      Centre de Tâches
+    </a>
+  </section>
+
+  <section class="games-section" aria-label="Jeux pour Tous">
+    <div class="section-title">PEPECO LE MEILLEUR ENTREPRISE D'INVESTISSEMENT</div>
+    <div class="games-list" role="list">
+      <div
+        class="game-item"
+        role="listitem"
+        tabindex="0"
+        aria-label="Jeu Hubris"
+               style="background-image:url('https://image.noelshack.com/fichiers/2025/41/6/1760188703-images-3.jpeg')"
+      ></div>
+      <div
+        class="game-item"
+        role="listitem"
+        tabindex="0"
+        aria-label="Jeu Sniper Elite VR"
+        style="background-image:url('https://image.noelshack.com/fichiers/2025/41/6/1760189566-finestrat-spain-august-entrance-pepco-store-shopping-center-european-discount-clothing-warsaw-poland-april-st-396436599.jpg')"
+      ></div>
+      <div
+        class="game-item"
+        role="listitem"
+        tabindex="0"
+        aria-label="Jeu Breachers"
+        style="background-image:url('https://image.noelshack.com/fichiers/2025/41/6/1760189663-images-4-1.jpeg')"
+      ></div>
+      <div
+        class="game-item"
+        role="listitem"
+        tabindex="0"
+        aria-label="Jeu Moonscar VR"
+        style="background-image:url('https://image.noelshack.com/fichiers/2025/41/6/1760189710-images-4-2.jpeg')"
+      ></div>
+    </div>
+  </section>
+
+  <nav class="bottom-nav" role="navigation" aria-label="Navigation principale">
+    <a href="accueil.html" class="active" aria-current="page">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /></svg>
+      Accueil
+    </a>
+    <a href="appareil.html">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 6H4v12h16V6z" /></svg>
+      Article 
+    </a>
+    <a href="equipe.html">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z" /></svg>
+      Équipe
+    </a>
+    <a href="solde.html">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4v-1H8v1c0 2.21 1.79 4 4 4z" /></svg>
+      Moi
+    </a>
+  </nav>
+
+  <!-- SCRIPT POUR AFFICHER LES SOLDES DYNAMIQUEMENT -->
+  <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+  import {
+    getAuth,
+    onAuthStateChanged,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword
+  } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+  import {
+    getDatabase,
+    ref,
+    get,
+    set,
+    update,
+    onValue,
+    runTransaction,
+    query,
+    orderByChild,
+    equalTo,
+    push
+  } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+
+  // 🔥 Configuration Firebase (PEPECO)
+  const firebaseConfig = {
+    apiKey: "AIzaSyCaDZQUirunG7CPrMISasgBVlVgkyuISko",
+    authDomain: "pepeco-f6f26.firebaseapp.com",
+    databaseURL: "https://pepeco-f6f26-default-rtdb.firebaseio.com",
+    projectId: "pepeco-f6f26",
+    storageBucket: "pepeco-f6f26.firebasestorage.app",
+    messagingSenderId: "175958489677",
+    appId: "1:175958489677:web:48b339d732e4207d0f7a04"
+  };
+  
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const database = getDatabase(app);
+
+    // Formate FCFA
+    function formatFCFA(amount) {
+      if (amount == null || isNaN(amount)) amount = 0;
+      return 'FCFA ' + Number(amount).toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    }
+
+    onAuthStateChanged(auth, (user) => {
+      // Recherche les éléments avec classe .stat-value pour Mon Solde et Revenus cumulés
+      const soldeCompteEl = document.querySelector('a.card[href="solde.html"] .stat-value');
+      const revenusEl = document.querySelector('a.card[href="revenus.html"] .stat-value');
+
+      if (user) {
+        const uid = user.uid;
+        const userRef = ref(database, `users/${uid}`);
+
+        // Écoute temps réel des données utilisateur
+        onValue(userRef, (snapshot) => {
+          const data = snapshot.val() || {};
+
+          if (soldeCompteEl) soldeCompteEl.textContent = formatFCFA(data.balance ?? 0);
+          if (revenusEl) revenusEl.textContent = formatFCFA(data.totalRevenue ?? 0);
+        });
+      } else {
+        // Pas connecté: affichage par défaut
+        if (soldeCompteEl) soldeCompteEl.textContent = 'FCFA 0';
+        if (revenusEl) revenusEl.textContent = 'FCFA 0';
+      }
+    });
+  </script>
+</body>
+</html>

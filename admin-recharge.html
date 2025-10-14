@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Administration des Recharges</title>
+<style>
+  body {
+    margin: 0; 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #900;
+    color: #222;
+    min-height: 100vh;
+    padding: 12px 10px 30px;
+    display: flex;
+    justify-content: center;
+  }
+  .container {
+    max-width: 480px;
+    width: 100%;
+  }
+  h1 {
+    text-align: center;
+    margin-bottom: 24px;
+    font-weight: 900;
+    font-size: 1.8rem;
+    letter-spacing: 0.1em;
+    color: #eee;
+  }
+  .card {
+    background: #f9f9f9;
+    border-radius: 14px;
+    padding: 18px 22px;
+    margin-bottom: 20px;
+    box-shadow: 0 5px 16px rgba(0,0,0,0.15);
+    user-select: none;
+    color: #222;
+    position: relative;
+  }
+  .card p {
+    margin: 6px 0;
+    font-weight: 600;
+    font-size: 1rem;
+    word-wrap: break-word;
+  }
+  .label {
+    font-weight: 700;
+  }
+  .status {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 6px 14px;
+    border-radius: 18px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    user-select:none;
+  }
+  .status.approuve {
+    background-color: #d4f7d4;
+    color: #207220;
+    box-shadow: 0 0 8px #91db91aa;
+  }
+  .status.rejete {
+    background-color: #f5d6d6;
+    color: #8a1313;
+    box-shadow: 0 0 8px #db919191;
+  }
+  .status.enattente {
+    background-color: #f9e4cd;
+    color: #8a4a10;
+    box-shadow: 0 0 8px #dbb09191;
+  }
+  .actions {
+    margin-top: 14px;
+    display: flex;
+    gap: 12px;
+  }
+  button {
+    flex: 1;
+    padding: 10px 0;
+    border-radius: 20px;
+    border: none;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    user-select:none;
+    box-shadow: 0 0 6px rgba(0,0,0,0.2);
+    transition: box-shadow 0.3s ease;
+  }
+  button:hover:not(:disabled) {
+    box-shadow: 0 0 12px rgba(0,0,0,0.4);
+  }
+  button:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+    box-shadow: none;
+  }
+  .btn-approve {
+    background-color: #8acd8a;
+    color: #174d17;
+  }
+  .btn-reject {
+    background-color: #d46a6a;
+    color: #520000;
+  }
+  .motif {
+    margin-top: 8px;
+    font-style: italic;
+    color: #a33;
+  }
+</style>
+</head>
+<body>
+  <div class="container" role="main" aria-label="Administration des recharges">
+    <h1>Administration des Recharges</h1>
+    <div id="cardsContainer" aria-live="polite">
+      <p style="text-align:center; color:#ddd;">Chargement des transactions…</p>
+    </div>
+  </div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+  import {
+    getAuth,
+    onAuthStateChanged,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword
+  } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+  import {
+    getDatabase,
+    ref,
+    get,
+    set,
+    update,
+    onValue,
+    runTransaction,
+    query,
+    orderByChild,
+    equalTo,
+    push
+  } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+
+  // 🔥 Configuration Firebase (PEPECO)
+  const firebaseConfig = {
+    apiKey: "AIzaSyCaDZQUirunG7CPrMISasgBVlVgkyuISko",
+    authDomain: "pepeco-f6f26.firebaseapp.com",
+    databaseURL: "https://pepeco-f6f26-default-rtdb.firebaseio.com",
+    projectId: "pepeco-f6f26",
+    storageBucket: "pepeco-f6f26.firebasestorage.app",
+    messagingSenderId: "175958489677",
+    appId: "1:175958489677:web:48b339d732e4207d0f7a04"
+  };
+  
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getDatabase(app);
+  const cardsContainer = document.getElementById('cardsContainer');
+
+  const formatDateTime = timestamp => {
+    if (!timestamp) return '-';
+    const d = new Date(timestamp);
+    return d.toLocaleDateString('fr-FR') + ' ' + d.toLocaleTimeString('fr-FR');
+  };
+
+  function createCard(email, uid, rechargeId, recharge) {
+    const card = document.createElement('div');
+    card.className = 'card';
+
+    card.innerHTML = `
+      <p><strong>Montant :</strong> ${recharge.montant?.toLocaleString() || '-'} FCFA</p>
+      <p><strong>Numéro :</strong> ${recharge.numero || '-'}</p>
+      <p><strong>Opérateur :</strong> ${recharge.operateur || '-'}</p>
+      <p><strong>Email :</strong> ${email || '-'}</p>
+      <p><strong>Date :</strong> ${formatDateTime(recharge.date || recharge.configuredAt)}</p>
+      <p><strong>Traité le :</strong> ${formatDateTime(recharge.creditedAt || recharge.rejectedAt) || '-'}</p>
+    `;
+
+    const statusKey = (recharge.status || 'enattente').toLowerCase();
+    let statusText = 'En attente', statusClass = 'enattente';
+    if (statusKey === 'confirmé' || statusKey === 'confirmed') {
+      statusText = 'Approuvé';
+      statusClass = 'approuve';
+    } else if (statusKey === 'rejeté' || statusKey === 'rejected') {
+      statusText = 'Rejeté';
+      statusClass = 'rejete';
+    }
+
+    const statusSpan = document.createElement('span');
+    statusSpan.className = 'status ' + statusClass;
+    statusSpan.textContent = statusText;
+
+    card.appendChild(statusSpan);
+
+    if (statusKey === 'rejeté' || statusKey === 'rejected') {
+      const motif = recharge.reason || recharge.motif || 'Pas reçu';
+      const motifP = document.createElement('p');
+      motifP.className = 'motif';
+      motifP.textContent = `Motif: ${motif}`;
+      card.appendChild(motifP);
+    }
+
+    // Boutons uniquement si en attente
+    if (statusKey === 'enattente') {
+      const actionsDiv = document.createElement('div');
+      actionsDiv.className = 'actions';
+
+      // Approuver
+      const btnApprove = document.createElement('button');
+      btnApprove.textContent = 'Approuver';
+      btnApprove.className = 'btn-approve';
+      btnApprove.onclick = () => handleApprove(uid, rechargeId, btnApprove, card);
+
+      // Rejeter
+      const btnReject = document.createElement('button');
+      btnReject.textContent = 'Rejeter';
+      btnReject.className = 'btn-reject';
+      btnReject.onclick = () => handleReject(uid, rechargeId, btnReject, card);
+
+      actionsDiv.appendChild(btnApprove);
+      actionsDiv.appendChild(btnReject);
+      card.appendChild(actionsDiv);
+    }
+
+    return card;
+  }
+
+  function displayCards(data) {
+    cardsContainer.innerHTML = '';
+    if (!data || Object.keys(data).length === 0) {
+      cardsContainer.innerHTML = '<p style="text-align:center; color:#bbb;">Aucune transaction trouvée.</p>';
+      return;
+    }
+    // Collecter toutes les cartes dans un tableau pour trier par date descendante
+    let cards = [];
+    for (const uid in data) {
+      const user = data[uid];
+      if (!user.recharges) continue;
+      const email = user.email || "-";
+      for (const rechargeId in user.recharges) {
+        const recharge = user.recharges[rechargeId];
+        cards.push({email, uid, rechargeId, recharge});
+      }
+    }
+    cards.sort((a, b) => {
+      const dateA = a.recharge.date || a.recharge.configuredAt || 0;
+      const dateB = b.recharge.date || b.recharge.configuredAt || 0;
+      return dateB - dateA; // plus récent premier
+    });
+
+    for (const item of cards) {
+      const card = createCard(item.email, item.uid, item.rechargeId, item.recharge);
+      cardsContainer.appendChild(card);
+    }
+  }
+
+  async function handleApprove(uid, rechargeId, button, card) {
+    if (!confirm('Valider l\'approbation de cette transaction ?')) return;
+    button.disabled = true;
+    button.textContent = 'Traitement...';
+    try {
+      const rechargeRef = ref(db, `users/${uid}/recharges/${rechargeId}`);
+      const rechargeSnap = await get(rechargeRef);
+      const recharge = rechargeSnap.val();
+      const montant = Number(recharge.montant) || 0;
+
+      await runTransaction(ref(db, `users/${uid}/balance`), current => (current || 0) + montant);
+      await update(rechargeRef, {
+        status: 'Confirmé',
+        creditedAt: Date.now()
+      });
+
+      card.querySelector('div.actions').remove();
+      const statusSpan = card.querySelector('.status');
+      statusSpan.textContent = 'Approuvé';
+      statusSpan.className = 'status approuve';
+      button.disabled = false;
+
+    } catch (e) {
+      alert("Erreur lors de l'approbation: " + e.message);
+      button.disabled = false;
+      button.textContent = 'Approuver';
+    }
+  }
+
+  async function handleReject(uid, rechargeId, button, card) {
+    const motif = prompt("Motif du rejet (optionnel) :", "Pas reçu");
+    if (motif === null) return;
+
+    button.disabled = true;
+    button.textContent = 'Traitement...';
+
+    try {
+      const rechargeRef = ref(db, `users/${uid}/recharges/${rechargeId}`);
+      const updates = {
+        status: 'Rejeté',
+        rejectedAt: Date.now(),
+      };
+      if (motif.trim() !== '') {
+        updates.motif = motif.trim();
+      }
+      await update(rechargeRef, updates);
+
+      card.querySelector('div.actions').remove();
+      const statusSpan = card.querySelector('.status');
+      statusSpan.textContent = 'Rejeté';
+      statusSpan.className = 'status rejete';
+
+      const motifP = document.createElement('p');
+      motifP.className = 'motif';
+      motifP.textContent = 'Motif: ' + (motif.trim() || 'Pas reçu');
+      card.appendChild(motifP);
+
+      button.disabled = false;
+
+    } catch (e) {
+      alert("Erreur lors du rejet: " + e.message);
+      button.disabled = false;
+      button.textContent = 'Rejeter';
+    }
+  }
+
+  onAuthStateChanged(auth, user => {
+    if (user) {
+      cardsContainer.innerHTML = '<p style="text-align:center; color:#bbb;">Chargement des transactions...</p>';
+      get(ref(db, 'users')).then(snapshot => {
+        displayCards(snapshot.val());
+      }).catch(err => {
+        cardsContainer.innerHTML = `<p style="text-align:center; color:#f99;">Erreur: ${err.message}</p>`;
+      });
+    } else {
+      cardsContainer.innerHTML = '<p style="text-align:center; color:#f99;">Connectez-vous pour accéder.</p>';
+      setTimeout(() => {
+        window.location.href = 'admin-login.html';
+      }, 2000);
+    }
+  });
+</script>
+</body>
+</html>

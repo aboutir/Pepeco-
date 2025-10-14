@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Générateur Code Cadeau</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #a52727, #670909);
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .container {
+      background-color: rgba(0,0,0,0.6);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 400px;
+      padding: 30px 40px;
+      box-shadow: 0 0 30px rgba(255,255,255,0.15);
+    }
+    h1 {
+      text-align: center;
+      font-weight: 900;
+      font-size: 1.8rem;
+      margin-bottom: 25px;
+      letter-spacing: 0.07em;
+      user-select:none;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    label {
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 8px;
+      user-select:none;
+    }
+    input[type="number"] {
+      padding: 12px 18px;
+      border-radius: 14px;
+      border: none;
+      font-size: 1.15rem;
+      font-weight: 600;
+      outline: none;
+      background-color: rgba(255,255,255,0.1);
+      color: white;
+    }
+    input[type="number"]:focus {
+      background-color: rgba(255,255,255,0.3);
+      color: #b71c1c;
+    }
+    button {
+      padding: 14px 0;
+      background: #b71c1c;
+      border: none;
+      border-radius: 25px;
+      font-size: 1.3rem;
+      font-weight: 900;
+      color: white;
+      cursor: pointer;
+      letter-spacing: 0.12em;
+      transition: background-color 0.3s ease;
+      user-select:none;
+    }
+    button:hover {
+      background: #800909;
+    }
+    #result {
+      margin-top: 18px;
+      font-weight: 700;
+      font-size: 1rem;
+      text-align: center;
+      padding: 12px 15px;
+      border-radius: 12px;
+      display: none;
+      user-select:none;
+    }
+    #result.success {
+      background-color: #a5d6a7;
+      color: #1b4d1b;
+      box-shadow: 0 0 15px #8bc34aaa;
+    }
+    #result.error {
+      background-color: #f48fb1;
+      color: #601427;
+      box-shadow: 0 0 15px #ef5350aa;
+    }
+    #copyButton {
+      margin-top: 10px;
+      width: 100%;
+      padding: 10px 0;
+      font-size: 1.1rem;
+      font-weight: 700;
+      background-color: #3b8915;
+      color: white;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      display: none;
+      user-select:none;
+      transition: background-color 0.3s ease;
+    }
+    #copyButton:hover {
+      background-color: #2a6e0c;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" role="main" aria-labelledby="pageTitle">
+    <h1 id="pageTitle">Générateur de Codes Cadeaux</h1>
+    <form id="giftCodeForm" aria-describedby="result" novalidate>
+      <label for="amount">Montant (FCFA)</label>
+      <input type="number" id="amount" name="amount" min="1" required aria-required="true" placeholder="Entrez un montant (ex: 5000)" />
+      <button type="submit">Générer Code</button>
+      <div id="result" role="alert"></div>
+      <button id="copyButton" aria-label="Copier le code cadeau" type="button">Copier le code</button>
+    </form>
+  </div>
+
+ <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+  import {
+    getAuth,
+    onAuthStateChanged,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword
+  } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+  import {
+    getDatabase,
+    ref,
+    get,
+    set,
+    update,
+    onValue,
+    runTransaction,
+    query,
+    orderByChild,
+    equalTo,
+    push
+  } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+
+  // 🔥 Configuration Firebase (PEPECO)
+  const firebaseConfig = {
+    apiKey: "AIzaSyCaDZQUirunG7CPrMISasgBVlVgkyuISko",
+    authDomain: "pepeco-f6f26.firebaseapp.com",
+    databaseURL: "https://pepeco-f6f26-default-rtdb.firebaseio.com",
+    projectId: "pepeco-f6f26",
+    storageBucket: "pepeco-f6f26.firebasestorage.app",
+    messagingSenderId: "175958489677",
+    appId: "1:175958489677:web:48b339d732e4207d0f7a04"
+  };
+  
+
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+
+    const form = document.getElementById("giftCodeForm");
+    const amountInput = document.getElementById("amount");
+    const resultEl = document.getElementById("result");
+    const copyButton = document.getElementById("copyButton");
+
+    let lastGeneratedCode = '';
+
+    function generateGiftCode() {
+      const randomNum = Math.floor(1000 + Math.random() * 9000);
+      return `CADEAU${randomNum}`;
+    }
+
+    async function isCodeUnique(code) {
+      const snapshot = await get(ref(database, `giftCodes/${code}`));
+      return !snapshot.exists();
+    }
+
+    async function generateUniqueCode() {
+      let code;
+      let attempts = 0;
+      do {
+        code = generateGiftCode();
+        const unique = await isCodeUnique(code);
+        if (unique) return code;
+        attempts++;
+      } while (attempts < 10);
+      throw new Error("Impossible de générer un code unique, essayer à nouveau.");
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const amount = parseInt(amountInput.value, 10);
+
+      if (!amount || amount <= 0) {
+        showResult("Veuillez entrer un montant valide supérieur à 0.", "error");
+        return;
+      }
+
+      showResult("Génération du code en cours...", "success");
+      copyButton.style.display = "none";
+
+      try {
+        const code = await generateUniqueCode();
+
+        await set(ref(database, `giftCodes/${code}`), {
+          amount: amount,
+          used: false,
+          createdAt: new Date().toISOString(),
+        });
+
+        lastGeneratedCode = code;
+
+        showResult(`Code cadeau généré avec succès : ${code} (Montant : FCFA ${amount})`, "success");
+        form.reset();
+        copyButton.style.display = "block";
+
+      } catch (error) {
+        console.error("Erreur génération code cadeau:", error);
+        showResult("Erreur lors de la génération du code cadeau. Veuillez réessayer.", "error");
+      }
+    });
+
+    copyButton.addEventListener("click", () => {
+      if (!lastGeneratedCode) return;
+      navigator.clipboard.writeText(lastGeneratedCode).then(() => {
+        copyButton.textContent = "Code copié !";
+        setTimeout(() => copyButton.textContent = "Copier le code", 2500);
+      }).catch(() => {
+        alert("Impossible de copier le code automatiquement. Veuillez le copier manuellement.");
+      });
+    });
+
+    function showResult(message, type) {
+      resultEl.textContent = message;
+      resultEl.className = type === "success" ? "success" : "error";
+      resultEl.style.display = "block";
+    }
+  </script>
+</body>
+</html>

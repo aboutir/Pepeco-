@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Historique des retraits - PEPECO</title>
+<style>
+  :root {
+    --color-bg: #c00000;
+    --color-text: #fff;
+    --color-header-bg: #8b0000;
+    --color-border: #fff;
+    --color-row-even-bg: rgba(255, 255, 255, 0.1);
+    --color-row-hover-bg: rgba(255, 255, 255, 0.3);
+    --color-status-process-bg: #444;
+    --color-status-success-bg: #000;
+    --color-status-fail-bg: #222;
+  }
+
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  header {
+    text-align: center;
+    padding: 8px 8px;
+    font-size: 1rem;
+    font-weight: 300;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+    user-select: none;
+    font-family: 'Segoe UI Light', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  main {
+    flex: 1;
+    padding: 8px 8px;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-x: auto;
+  }
+
+  #message {
+    text-align: center;
+    margin-bottom: 8px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+  }
+
+  table {
+    width: 100vw;
+    max-width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    margin-right: calc(-50vw + 50%);
+    border-collapse: separate;
+    border-spacing: 0 4px;
+    font-size: 0.75rem;
+    border: 1.3px solid var(--color-border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  thead {
+    background-color: var(--color-header-bg);
+  }
+
+  thead tr th {
+    color: var(--color-text);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 6px 6px;
+    user-select: none;
+    border-bottom: 1.3px solid var(--color-border);
+  }
+
+  tbody tr {
+    background: transparent;
+    transition: background-color 0.3s ease;
+    border-left: 1.3px solid var(--color-border);
+    border-right: 1.3px solid var(--color-border);
+  }
+
+  tbody tr:nth-child(even) {
+    background: var(--color-row-even-bg);
+  }
+
+  tbody tr:hover {
+    background-color: var(--color-row-hover-bg);
+  }
+
+  td {
+    padding: 6px 6px;
+    text-align: center;
+    color: var(--color-text);
+  }
+
+  td.amount {
+    font-weight: 600;
+    color: #ffdede;
+  }
+
+  td.fees {
+    font-weight: 600;
+    color: #fff5b1;
+  }
+
+  td.net {
+    font-weight: 700;
+    color: #b1ffd2;
+  }
+
+  .status {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 18px;
+    font-weight: 700;
+    font-size: 0.7rem;
+    text-transform: capitalize;
+    color: var(--color-text);
+    box-shadow: 0 0 5px rgba(0,0,0,0.3);
+    min-width: 70px;
+  }
+
+  .status.traitement {
+    background-color: var(--color-status-process-bg);
+  }
+
+  .status.valide {
+    background-color: var(--color-status-success-bg);
+  }
+
+  .status.echoue {
+    background-color: var(--color-status-fail-bg);
+  }
+
+  footer {
+    padding: 8px 10px;
+    text-align: center;
+    color: black;
+    font-weight: 600;
+    font-size: 0.8rem;
+    background: transparent;
+  }
+
+  @media (max-width: 600px) {
+    table, thead, tbody, th, td, tr {
+      display: block;
+    }
+    thead tr {
+      position: absolute;
+      top: -9999px;
+      left: -9999px;
+    }
+    tr {
+      margin-bottom: 10px;
+      border-left: none !important;
+      border-right: none !important;
+      padding: 6px 8px;
+      border-radius: 8px;
+      background-color: var(--color-row-even-bg);
+      box-shadow: 0 0 8px rgba(0,0,0,0.3);
+    }
+    td {
+      padding-left: 50%;
+      text-align: left;
+      position: relative;
+      border-bottom: 1px solid var(--color-border);
+      font-size: 0.75rem;
+    }
+    td:before {
+      position: absolute;
+      top: 8px;
+      left: 12px;
+      width: 45%;
+      white-space: nowrap;
+      font-weight: 700;
+      text-transform: capitalize;
+      color: var(--color-text);
+      text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+      font-size: 0.75rem;
+    }
+    td:nth-of-type(1):before { content: "Date & Heure"; }
+    td:nth-of-type(2):before { content: "Montant"; }
+    td:nth-of-type(3):before { content: "Frais"; }
+    td:nth-of-type(4):before { content: "Montant Net"; }
+    td:nth-of-type(5):before { content: "Statut"; }
+  }
+</style>
+</head>
+<body>
+<header>Historique des retraits PEPECO</header>
+<main>
+  <div id="message"></div>
+  <table id="history-table" aria-describedby="message" role="table" >
+    <thead>
+      <tr>
+        <th scope="col">Date & Heure</th>
+        <th scope="col">Montant retirer</th>
+        <th scope="col">Frais</th>
+        <th scope="col">Montant Net</th>
+        <th scope="col">Statut</th>
+      </tr>
+    </thead>
+    <tbody id="history-body" role="rowgroup">
+      <!-- Données chargées ici -->
+    </tbody>
+  </table>
+</main>
+<footer>&copy; PEPECO - Tous droits réservés</footer>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+  import {
+    getAuth,
+    onAuthStateChanged,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword
+  } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+  import {
+    getDatabase,
+    ref,
+    get,
+    set,
+    update,
+    onValue
+  } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+
+  // 🔥 Configuration Firebase (PEPECO)
+  const firebaseConfig = {
+    apiKey: "AIzaSyCaDZQUirunG7CPrMISasgBVlVgkyuISko",
+    authDomain: "pepeco-f6f26.firebaseapp.com",
+    databaseURL: "https://pepeco-f6f26-default-rtdb.firebaseio.com",
+    projectId: "pepeco-f6f26",
+    storageBucket: "pepeco-f6f26.firebasestorage.app",
+    messagingSenderId: "175958489677",
+    appId: "1:175958489677:web:48b339d732e4207d0f7a04"
+  };
+  
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const database = getDatabase(app);
+
+  const messageEl = document.getElementById('message');
+  const historyBody = document.getElementById('history-body');
+
+  function formatAmount(amount) {
+    return amount.toLocaleString('fr-FR') + ' FCFA';
+  }
+
+  function formatDate(timestamp) {
+    const date = new Date(timestamp);
+    return date.toLocaleString('fr-FR',{
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit'
+    });
+  }
+
+  function showMessage(msg, isError = true) {
+    messageEl.textContent = msg;
+    messageEl.style.color = isError ? '#ff4d4d' : '#d4f5d4';
+  }
+
+  function clearHistory() {
+    historyBody.innerHTML = '';
+  }
+
+  function populateHistory(withdrawals) {
+    clearHistory();
+    if (!withdrawals || withdrawals.length === 0) {
+      showMessage("Aucun retrait trouvé.", false);
+      return;
+    }
+    showMessage('', false);
+
+    withdrawals.forEach(item => {
+      const tr = document.createElement('tr');
+
+      const dateTd = document.createElement('td');
+      dateTd.textContent = formatDate(item.timestamp);
+      tr.appendChild(dateTd);
+
+      const amountTd = document.createElement('td');
+      amountTd.textContent = `−${formatAmount(item.amount)}`;
+      amountTd.classList.add('amount');
+      tr.appendChild(amountTd);
+
+      const feesTd = document.createElement('td');
+      feesTd.textContent = formatAmount(item.fees);
+      feesTd.classList.add('fees');
+      tr.appendChild(feesTd);
+
+      const totalTd = document.createElement('td');
+      totalTd.textContent = formatAmount(item.totalAmount);
+      totalTd.classList.add('net');
+      tr.appendChild(totalTd);
+
+      const statusTd = document.createElement('td');
+      statusTd.textContent = item.status || 'Inconnu';
+      statusTd.classList.add('statu');
+      if(item.status) {
+        const statut = item.status.toLowerCase();
+        if(statut.includes('traitement')) {
+          statusTd.classList.add('traitement');
+        } else if(statut.includes('valide')) {
+          statusTd.classList.add('valide');
+        } else if(statut.includes('échoué') || statut.includes('echoue')) {
+          statusTd.classList.add('echoue');
+        }
+      }
+      tr.appendChild(statusTd);
+
+      historyBody.appendChild(tr);
+    });
+  }
+
+  onAuthStateChanged(auth, (user) => {
+    if(user) {
+      const historyRef = ref(database, `users/${user.uid}/withdrawalHistory`);
+      get(historyRef).then(snapshot => {
+        if(snapshot.exists()){
+          const data = Object.values(snapshot.val()).sort((a,b) => b.timestamp - a.timestamp);
+          populateHistory(data);
+        } else {
+          showMessage("Aucun retrait enregistré.", false);
+        }
+      });
+    } else {
+      showMessage("Connectez-vous pour voir votre historique.", true);
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Inscription / Connexion - PEPECO</title>
+  <style>
+   :root{
+  --bg: #d01818;
+  --card: rgba(255,255,255,0.15);
+  --text: #f0f0f0;
+  --muted: #bbb;
+  --pepo: #e60023;
+  --input-bg: transparent;
+  --button-bg: transparent;
+  --select-bg: rgba(255,255,255,0.12);
+  --shadow: rgba(0,0,0,0.12);
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; font-family: Inter, system-ui, Arial, sans-serif; }
+
+body {
+  background: radial-gradient(circle at 20% -10%, rgba(255,255,255,0.25), transparent 40%),
+              radial-gradient(circle at 100% 0%, rgba(255,255,255,0.15), transparent 40%),
+              var(--bg);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.container {
+  width: min(420px, 94%);
+  background: var(--card);
+  border-radius: 14px;
+  padding: 28px 28px 20px;
+  box-shadow: 0 12px 28px var(--shadow);
+  text-align: center;
+  border: 1px solid rgba(255,255,255,0.3);
+}
+
+.brand {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.brand .logo {
+  width: 72px;
+  height: 72px;
+  border-radius: 12px;
+  background: transparent;
+  display: grid;
+  place-items: center;
+  padding: 6px;
+}
+
+/* ✅ Correction ici : on retire le filtre blanc */
+.brand .logo img {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.brand .title {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: .5px;
+  color: #fff;
+  text-shadow: 0 1px 0 rgba(0,0,0,.25);
+  user-select: none;
+}
+
+#formTitle {
+  font-size: 20px;
+  margin: 6px 0 14px;
+  color: #fff;
+}
+
+form {
+  text-align: left;
+}
+
+.hidden {
+  display: none;
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+label {
+  font-size: 12px;
+  color: var(--muted);
+  opacity: 0.9;
+  user-select: none;
+}
+
+input, select {
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1.5px solid rgba(255,255,255,0.6);
+  outline: none;
+  color: var(--text);
+  background: var(--input-bg);
+  padding: 10px 14px;
+  transition: border-color 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+input::placeholder {
+  color: var(--muted);
+  opacity: 0.6;
+}
+
+input:focus, select:focus {
+  border-color: #fff;
+  box-shadow: 0 0 8px rgba(255,255,255,0.55);
+  background: rgba(255,255,255,0.08);
+}
+
+select {
+  background-color: var(--select-bg);
+  padding-left: 40px;
+  background-image: url("data:image/svg+xml;charset=UTF-8,<svg width='12' height='7' viewBox='0 0 12 7' xmlns='http://www.w3.org/2000/svg'><path fill='%23fff' d='M6 7L0 0h12L6 7z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 12px 7px;
+  cursor: pointer;
+  box-shadow: 0 0 8px var(--shadow);
+  position: relative;
+}
+
+input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: var(--input-bg);
+}
+
+button {
+  width: 100%;
+  padding: 12px 0;
+  border: 2px solid #fff;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  background: var(--button-bg);
+  color: #fff;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  user-select: none;
+}
+
+button:hover {
+  background-color: #fff;
+  color: var(--pepo);
+  border-color: #fff;
+}
+
+button:active { transform: translateY(1px); }
+
+.toggle {
+  font-size: 13px;
+  color: #fff;
+  opacity: .95;
+  margin-top: 12px;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  display: inline-block;
+  text-align: center;
+  user-select: none;
+}
+
+.service-client-btn {
+  margin-top: 18px;
+  background-color: transparent;
+  border-radius: 50%;
+  width: 54px;
+  height: 54px;
+  border: 2px solid #fff;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: auto;
+  margin-right: auto;
+  box-shadow: 0 4px 12px var(--shadow);
+  transition: background-color 0.25s ease;
+  user-select: none;
+}
+
+.service-client-btn:hover {
+  background-color: rgba(255,255,255,0.15);
+}
+
+.service-client-btn img {
+  width: 26px;
+  height: 26px;
+  filter: brightness(0) invert(1);
+  user-select: none;
+}
+
+#referralStatus {
+  font-size: 12px;
+  height: 16px;
+  margin-top: -8px;
+  margin-bottom: 10px;
+  display: none;
+  user-select: none;
+}
+
+.referral-status.valid {
+  color: #a6f3a6;
+}
+
+.referral-status.invalid {
+  color: #f96d6d;
+}
+
+#loginError, #signupError, #signupSuccess {
+  font-size: 13px;
+  margin-top: 6px;
+  display: none;
+  user-select: none;
+}
+
+#loginError, #signupError {
+  color: #f96d6d;
+}
+
+#signupSuccess {
+  color: #a6f3a6;
+}
+
+@media (max-width: 460px) {
+  .brand .title { font-size: 24px; }
+  .container { padding: 22px 20px; }
+}
+  </style>
+</head>
+<body>
+  <div class="container" id="container">
+    <div class="brand" aria-label="Brand PEPECO">
+      <div class="logo" title="Logo PEPECO">
+        <img src="https://image.noelshack.com/fichiers/2025/42/3/1760481582-images-1.png" alt="Logo PEPECO" />
+      </div>
+      <div class="title" id="formTitle">PEPECO</div>
+    </div>
+
+    <!-- Formulaire Connexion -->
+    <form id="loginFormData" novalidate>
+      <div class="field">
+        <label for="loginCountry">Choisissez votre pays</label>
+        <select id="loginCountry" name="loginCountry" required>
+          <option value="" disabled selected>Sélectionnez un pays</option>
+          <option value="CI" data-flag="🇨🇮">Côte d'Ivoire</option>
+          <option value="BJ" data-flag="🇧🇯">Bénin</option>
+          <option value="TG" data-flag="🇹🇬">Togo</option>
+          <option value="ML" data-flag="🇲🇱">Mali</option>
+          <option value="SN" data-flag="🇸🇳">Sénégal</option>
+          <option value="BF" data-flag="🇧🇫">Burkina Faso</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="loginTelephone">Numéro de compte</label>
+        <input type="text" id="loginTelephone" name="loginTelephone" placeholder="Ex: 123456789" required autocorrect="off" autocapitalize="off" disabled />
+      </div>
+
+      <div class="field">
+        <label for="loginPassword">Mot de passe</label>
+        <input type="password" id="loginPassword" name="loginPassword" placeholder="Mot de passe" required autocomplete="current-password" />
+      </div>
+
+      <button type="submit">Se connecter</button>
+      <div class="toggle" id="switch-to-signup" role="button" tabindex="0" aria-label="Basculer vers inscription">Pas encore inscrit ? S'inscrire</div>
+      <div id="loginError"></div>
+    </form>
+
+    <!-- Formulaire Inscription -->
+    <form id="signupFormData" class="hidden" novalidate>
+      <div class="field">
+        <label for="signupUsername">Nom complet</label>
+        <input type="text" id="signupUsername" name="signupUsername" placeholder="Votre nom" required autocorrect="off" autocapitalize="words" />
+      </div>
+
+      <div class="field">
+        <label for="signupCountry">Choisissez votre pays</label>
+        <select id="signupCountry" name="signupCountry" required>
+          <option value="" disabled selected>Sélectionnez un pays</option>
+          <option value="CI" data-flag="🇨🇮">Côte d'Ivoire</option>
+          <option value="BJ" data-flag="🇧🇯">Bénin</option>
+          <option value="TG" data-flag="🇹🇬">Togo</option>
+          <option value="ML" data-flag="🇲🇱">Mali</option>
+          <option value="SN" data-flag="🇸🇳">Sénégal</option>
+          <option value="BF" data-flag="🇧🇫">Burkina Faso</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="signupTelephone">Numéro de téléphone</label>
+        <input type="text" id="signupTelephone" name="signupTelephone" placeholder="Ex: 07 123 4567" required autocorrect="off" autocapitalize="off" disabled />
+      </div>
+
+      <div class="field">
+        <label for="signupPassword">Mot de passe</label>
+        <input type="password" id="signupPassword" name="signupPassword" placeholder="Mot de passe" required autocomplete="new-password" />
+      </div>
+
+      <div class="field">
+        <label for="confirmPassword">Confirmer le mot de passe</label>
+        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirmer le mot de passe" required autocomplete="new-password" />
+      </div>
+
+      <div class="field">
+        <label for="referralCode">Code de parrainage (optionnel)</label>
+        <input type="text" id="referralCode" name="referralCode" placeholder="Entrez un code de parrainage" autocapitalize="characters" />
+        <div id="referralStatus" class="referral-status"></div>
+      </div>
+
+      <button type="submit">S'inscrire</button>
+      <div class="toggle" id="switch-to-login" role="button" tabindex="0" aria-label="Basculer vers connexion">Déjà inscrit ? Se connecter</div>
+      <div id="signupError"></div>
+      <div id="signupSuccess"></div>
+    </form>
+
+    <button class="service-client-btn" title="Service Client" aria-label="Service Client">
+      <img src="https://img.icons8.com/ios-filled/50/000000/customer-support.png" alt="Service Client" />
+    </button>
+  </div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+  import {
+    getAuth,
+    onAuthStateChanged,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword
+  } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+  import {
+    getDatabase,
+    ref,
+    get,
+    set
+  } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+
+  // 🔥 Configuration Firebase (PEPECO)
+  const firebaseConfig = {
+    apiKey: "AIzaSyCaDZQUirunG7CPrMISasgBVlVgkyuISko",
+    authDomain: "pepeco-f6f26.firebaseapp.com",
+    databaseURL: "https://pepeco-f6f26-default-rtdb.firebaseio.com",
+    projectId: "pepeco-f6f26",
+    storageBucket: "pepeco-f6f26.firebasestorage.app",
+    messagingSenderId: "175958489677",
+    appId: "1:175958489677:web:48b339d732e4207d0f7a04"
+  };
+
+  // 🔧 Initialisation Firebase
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const database = getDatabase(app);
+
+  // --- Gestion des formulaires ---
+  window.toggleForm = function () {
+    const loginForm = document.getElementById('loginFormData');
+    const signupForm = document.getElementById('signupFormData');
+    const formTitle = document.getElementById('formTitle');
+    if (loginForm.classList.contains('hidden')) {
+      loginForm.classList.remove('hidden');
+      signupForm.classList.add('hidden');
+      formTitle.textContent = 'Connexion';
+      clearMessages();
+    } else {
+      loginForm.classList.add('hidden');
+      signupForm.classList.remove('hidden');
+      formTitle.textContent = 'Inscription';
+      clearMessages();
+    }
+  }
+
+  // --- Formats de téléphone ---
+  const phoneFormats = {
+    'CI': { code: '+225', format: 'XX XXX XXXX', example: '07 123 4567', pattern: /^[0-9]{2} [0-9]{3} [0-9]{4}$/ },
+    'ML': { code: '+223', format: 'XX XX XX XX', example: '76 12 34 56', pattern: /^[0-9]{2} [0-9]{2} [0-9]{2} [0-9]{2}$/ },
+    'SN': { code: '+221', format: 'XX XXX XX XX', example: '77 123 45 67', pattern: /^[0-9]{2} [0-9]{3} [0-9]{2} [0-9]{2}$/ },
+    'BF': { code: '+226', format: 'XX XX XX XX', example: '70 12 34 56', pattern: /^[0-9]{2} [0-9]{2} [0-9]{2} [0-9]{2}$/ },
+    'NE': { code: '+227', format: 'XX XX XX XX', example: '90 12 34 56', pattern: /^[0-9]{2} [0-9]{2} [0-9]{2} [0-9]{2}$/ },
+    'BJ': { code: '+229', format: 'XX XX XX XX', example: '97 12 34 56', pattern: /^[0-9]{2} [0-9]{2} [0-9]{2} [0-9]{2}$/ },
+    'TG': { code: '+228', format: 'XX XXX XXX', example: '90 123 456', pattern: /^[0-9]{2} [0-9]{3} [0-9]{3}$/ }
+  };
+
+  // --- Fonctions utilitaires ---
+  function updatePhoneFormat(formType) {
+    const country = document.getElementById(formType + 'Country').value;
+    const phoneFormat = phoneFormats[country];
+    if (phoneFormat) {
+      document.getElementById(formType + 'Telephone').placeholder = phoneFormat.example;
+    } else {
+      document.getElementById(formType + 'Telephone').placeholder = '';
+    }
+  }
+
+  function togglePhoneInput(formType) {
+    const countrySelect = document.getElementById(formType + 'Country');
+    const phoneInput = document.getElementById(formType + 'Telephone');
+    if (countrySelect && phoneInput) {
+      phoneInput.disabled = !countrySelect.value;
+      if (!countrySelect.value) phoneInput.value = '';
+    }
+  }
+
+  function clearMessage(id) {
+    const el = document.getElementById(id);
+    if (el) {
+      el.textContent = '';
+      el.style.display = 'none';
+    }
+  }
+
+  function clearMessages() {
+    ['loginError', 'signupError', 'signupSuccess', 'referralStatus'].forEach(id => clearMessage(id));
+  }
+
+  // --- Classe d’utilitaires ---
+  class Utils {
+    static generateReferralCode() {
+      const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+      return Array.from({ length: 6 }, () =>
+        chars.charAt(Math.floor(Math.random() * chars.length))
+      ).join("");
+    }
+
+    static async checkReferralCode(code) {
+      if (!code) return null;
+      const snapshot = await get(ref(database, "users"));
+      if (snapshot.exists()) {
+        const users = snapshot.val();
+        for (const userId in users) {
+          if ((users[userId].referralCode ?? "").toUpperCase() === code.toUpperCase()) {
+            return { userId, username: users[userId].username ?? "" };
+          }
+        }
+      }
+      return null;
+    }
+
+    static showError(id, message) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.textContent = message;
+        el.style.display = message ? "block" : "none";
+      }
+    }
+
+    static showSuccess(id, message) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.textContent = message;
+        el.style.display = message ? "block" : "none";
+      }
+    }
+
+    static updateReferralStatus(isValid, message) {
+      const el = document.getElementById("referralStatus");
+      if (el) {
+        el.textContent = message;
+        el.className = `referral-status ${isValid ? "valid" : "invalid"}`;
+        el.style.display = message ? "block" : "none";
+      }
+    }
+  }
+
+  // --- Gestion des formulaires ---
+  class FormManager {
+    static async handleSignup(event) {
+      event.preventDefault();
+      clearMessages();
+
+      try {
+        const username = document.getElementById("signupUsername").value.trim();
+        const telephone = document.getElementById("signupTelephone").value.trim();
+        const email = `${telephone}@temp.com`;
+        const password = document.getElementById("signupPassword").value;
+        const confirmPassword = document.getElementById("confirmPassword").value;
+        const referralCode = document.getElementById("referralCode").value.trim().toUpperCase();
+
+        if (!username || !telephone || !password || !confirmPassword)
+          throw new Error("Veuillez remplir tous les champs requis");
+        if (password !== confirmPassword)
+          throw new Error("Les mots de passe ne correspondent pas");
+        if (password.length < 6)
+          throw new Error("Le mot de passe doit contenir au moins 6 caractères");
+        if (telephone.length < 8)
+          throw new Error("Numéro de téléphone invalide");
+
+        let referrerData = null;
+        if (referralCode) {
+          referrerData = await Utils.checkReferralCode(referralCode);
+          if (!referrerData) throw new Error("Code de parrainage invalide");
+        }
+
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        const newReferralCode = Utils.generateReferralCode();
+
+        await set(ref(database, "users/" + user.uid), {
+          username,
+          email,
+          phoneNumber: telephone,
+          balance: referrerData ? 100 : 0,
+          referralCode: newReferralCode,
+          referredBy: referrerData?.userId || null,
+          createdAt: Date.now()
+        });
+
+        if (referrerData?.userId) {
+          const referrerRef = ref(database, `users/${referrerData.userId}`);
+          const referrerSnapshot = await get(referrerRef);
+          if (referrerSnapshot.exists()) {
+            const currentBalance = referrerSnapshot.val().balance || 0;
+            await set(ref(database, `users/${referrerData.userId}/balance`), currentBalance + 10);
+          }
+        }
+
+        Utils.showSuccess("signupSuccess", "Compte créé avec succès ! Redirection...");
+        setTimeout(() => window.location.href = "accueil.html", 1500);
+
+      } catch (error) {
+        Utils.showError("signupError", error.message);
+      }
+    }
+
+    static async handleLogin(event) {
+      event.preventDefault();
+      clearMessages();
+
+      try {
+        const telephone = document.getElementById("loginTelephone").value.trim();
+        const password = document.getElementById("loginPassword").value;
+
+        if (!telephone || !password)
+          throw new Error("Veuillez remplir tous les champs");
+
+        const email = `${telephone}@temp.com`;
+        await signInWithEmailAndPassword(auth, email, password);
+        window.location.href = "accueil.html";
+
+      } catch {
+        Utils.showError("loginError", "Numéro ou mot de passe incorrect");
+      }
+    }
+
+    static async handleReferralCodeInput() {
+      const code = document.getElementById("referralCode").value.trim().toUpperCase();
+      if (!code) {
+        Utils.updateReferralStatus(true, "");
+        return;
+      }
+      try {
+        const referrerData = await Utils.checkReferralCode(code);
+        if (referrerData) {
+          Utils.updateReferralStatus(true, `Code valide ! Parrain: ${referrerData.username}`);
+        } else {
+          Utils.updateReferralStatus(false, "Code de parrainage invalide");
+        }
+      } catch {
+        Utils.updateReferralStatus(false, "Erreur lors de la vérification du code");
+      }
+    }
+  }
+
+  // ✅ Correction : ajout de la fonction debounce
+  function debounce(func, delay) {
+    let timer;
+    return (...args) => {
+      clearTimeout(timer);
+      timer = setTimeout(() => func.apply(this, args), delay);
+    };
+  }
+
+  // --- Initialisation ---
+  document.addEventListener("DOMContentLoaded", () => {
+    const signupForm = document.getElementById("signupFormData");
+    const loginForm = document.getElementById("loginFormData");
+    const referralInput = document.getElementById("referralCode");
+
+    if (signupForm) signupForm.addEventListener("submit", (e) => FormManager.handleSignup(e));
+    if (loginForm) loginForm.addEventListener("submit", (e) => FormManager.handleLogin(e));
+    if (referralInput) referralInput.addEventListener("input", debounce(FormManager.handleReferralCodeInput, 500));
+
+    ['login', 'signup'].forEach(formType => {
+      togglePhoneInput(formType);
+      const countrySelect = document.getElementById(formType + 'Country');
+      if (countrySelect) {
+        countrySelect.addEventListener('change', () => {
+          togglePhoneInput(formType);
+          updatePhoneFormat(formType);
+        });
+      }
+    });
+
+    document.getElementById('switch-to-signup').addEventListener('click', window.toggleForm);
+    document.getElementById('switch-to-login').addEventListener('click', window.toggleForm);
+  });
+
+  onAuthStateChanged(auth, (user) => {
+    if (user) console.log("Utilisateur connecté:", user.uid);
+    else console.log("Aucun utilisateur connecté");
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Confirmation de recharge</title>
+<style>
+  body {
+    margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #c00000; color: white;
+    display: flex; justify-content: center; align-items: center;
+    min-height: 100vh; padding: 20px;
+  }
+  .container {
+    background: rgba(255,255,255,0.12);
+    padding: 30px 25px 40px 25px; border-radius: 25px;
+    width: 100%; max-width: 420px;
+    box-shadow: 0 0 25px rgba(0,0,0,0.5);
+    box-sizing: border-box;
+  }
+  h1 {
+    text-align: center; font-weight: 700; font-size: 1.8rem; margin-bottom: 22px;
+  }
+  label {
+    font-weight: 600; font-size: 1rem; display: block; margin-bottom: 8px;
+  }
+  input, button {
+    width: 100%; padding: 12px 15px; border-radius: 15px; border: none;
+    font-weight: 600; font-size: 1rem; outline: none; background: rgba(255,255,255,0.3);
+    color: white; margin-bottom: 16px; transition: background-color 0.3s ease;
+  }
+  input::placeholder {
+    color: #eaeaea;
+  }
+  input:focus {
+    background-color: rgba(255,255,255,0.6);
+    color: #c00000;
+  }
+  button {
+    background-color: white; color: #c00000; cursor: pointer; font-weight: 700;
+  }
+  button:hover {
+    background-color: #f0f0f0;
+  }
+  #instructions {
+    background: rgba(255,255,255,0.18); 
+    border-radius: 12px; 
+    padding: 15px; 
+    font-size: 0.95rem; 
+    line-height: 1.4;
+    margin-top: 15px;
+    user-select: none;
+  }
+  #message {
+    text-align: center;
+    font-weight: 600;
+    margin-top: 12px;
+    height: 1.4em;
+    color: #ffdede;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Confirmation de recharge</h1>
+  <div>
+    <label>Veuillez saisir le montant de recharge</label>
+    <input type="number" id="amountInput" min="100" step="100" placeholder="Montant en FCFA" required />
+
+    <label>Veuillez copier ce numéro de recharge</label>
+    <input type="text" id="rechargeNumber" readonly style="cursor:pointer;" title="Cliquez pour copier" />
+
+    <label>Veuillez saisir votre numéro de recharge</label>
+    <input type="text" id="userNumber" placeholder="Ex: 01 23 45 67" required />
+
+    <label>Veuillez saisir l'ID de transaction</label>
+    <input type="text" id="transactionId" placeholder="ID de la transaction" required />
+
+    <button id="confirmBtn" type="button">Confirmer</button>
+  </div>
+
+  <div id="instructions" aria-live="polite">
+    Les instructions de paiement s’afficheront ici.
+  </div>
+
+  <div id="message" aria-live="polite"></div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+  import {
+    getAuth,
+    onAuthStateChanged,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword
+  } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+  import {
+    getDatabase,
+    ref,
+    get,
+    set,
+    update,
+    onValue,
+    runTransaction,
+    query,
+    orderByChild,
+    equalTo,
+    push
+  } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+
+  // 🔥 Configuration Firebase (PEPECO)
+  const firebaseConfig = {
+    apiKey: "AIzaSyCaDZQUirunG7CPrMISasgBVlVgkyuISko",
+    authDomain: "pepeco-f6f26.firebaseapp.com",
+    databaseURL: "https://pepeco-f6f26-default-rtdb.firebaseio.com",
+    projectId: "pepeco-f6f26",
+    storageBucket: "pepeco-f6f26.firebasestorage.app",
+    messagingSenderId: "175958489677",
+    appId: "1:175958489677:web:48b339d732e4207d0f7a04"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getDatabase(app);
+
+  // 🔹 Récupération des paramètres URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const selectedCountry = urlParams.get("country");
+  const selectedOperator = urlParams.get("operator");
+
+  // 🔹 Numéros de recharge selon le pays et opérateur
+  const rechargeNumbers = {
+    "MTN Côte d'Ivoire": "2250584726869",
+    "Moov Côte d'Ivoire": "2250173750225",
+    "Wave Côte d'Ivoire": "indisponible",
+    "Orange Côte d'Ivoire": "indisponible",
+    "MTN Bénin": "2250584726869",
+    "Moov Bénin": "2250173750225",
+    "Moov Togo": "2250173750225",
+    "MTN Burkina Faso": "2250584726869",
+    "Moov Burkina Faso": "2250173750225",
+    "Orange Burkina Faso": "indisponible",
+    "Orange Sénégal": "indisponible",
+    "Wave Sénégal": "indisponible",
+    "Orange Mali": "indisponible",
+    "Wave Mali": "indisponible"
+  };
+
+  // 🔹 Instructions selon le pays
+  const paymentInstructions = {
+    coteivoire: `
+      <strong>Côte d’Ivoire - Instructions de recharge :</strong><br>
+      1. Copiez le numéro de recharge affiché.<br>
+      2. Pour MTN : *133# → option 3 → Transfert d’argent.<br>
+      3. Pour Moov : *155# → option 1 → option 1.<br>
+      4. Pour Orange : *144# → Transfert.<br>
+      5. Pour Wave : Entrez le nom "Pepeco Pepeco" et suivez les instructions.<br>
+      6. Après le transfert, revenez ici pour confirmer avec l’ID de transaction.
+    `,
+    benin: `
+      <strong>Bénin - Recharge vers Côte d’Ivoire :</strong><br>
+      1. Pour MTN : *880# → option 1 → Transfert international → entrez le numéro ivoirien.<br>
+      2. Pour Moov : *855# → International → Côte d’Ivoire → entrez le numéro copié.<br>
+      3. Revenez ici pour confirmer avec l’ID de transaction.
+    `,
+    togo: `
+      <strong>Togo :</strong><br>
+      1. Tapez *155*1*2*numéro*montant*code secret#.<br>
+      2. Conservez l’ID de transaction et revenez ici.
+    `,
+    burkinafaso: `
+      <strong>Burkina Faso :</strong><br>
+      1. MTN : *123# → Transfert d’argent → numéro CI + montant.<br>
+      2. Moov : *155# → option 1 → option 1 → numéro CI + montant.<br>
+      3. Orange : *144# → Transfert → numéro CI + montant.<br>
+      4. Reconfirmez ici avec votre ID de transaction.
+    `,
+    senegal: `
+      <strong>Sénégal :</strong><br>
+      1. Copiez le numéro de recharge.<br>
+      2. Orange : *144# → Transfert vers CI.<br>
+      3. Wave : Entrez "Pepeco Pepeco" → Transfert → numéro CI.<br>
+      4. Conservez l’ID de transaction.
+    `,
+    mali: `
+      <strong>Mali :</strong><br>
+      1. Orange : *144# → Transfert d’argent → numéro CI + montant.<br>
+      2. Wave : Nom "Pepeco Pepeco" → Transfert → numéro CI + montant.<br>
+      3. Conservez l’ID de transaction.
+    `
+  };
+
+  // 🔹 Affichage du numéro et des instructions
+  const rechargeNumberInput = document.getElementById("rechargeNumber");
+  const instructionsDiv = document.getElementById("instructions");
+
+  rechargeNumberInput.value = rechargeNumbers[selectedOperator] || "xxxxxxxxxx";
+  instructionsDiv.innerHTML = paymentInstructions[selectedCountry] || "Instructions de paiement non disponibles pour ce pays.";
+
+  // 🔹 Copier le numéro de recharge au clic
+  rechargeNumberInput.addEventListener("click", () => {
+    rechargeNumberInput.select();
+    document.execCommand("copy");
+    alert("Numéro de recharge copié !");
+  });
+
+  // 🔹 Confirmation du paiement
+  const confirmBtn = document.getElementById("confirmBtn");
+  const messageDiv = document.getElementById("message");
+
+  confirmBtn.addEventListener("click", async () => {
+    const montant = document.getElementById("amountInput").value.trim();
+    const userNumber = document.getElementById("userNumber").value.trim();
+    const transId = document.getElementById("transactionId").value.trim();
+
+    // Vérifications
+    if (!montant || isNaN(montant) || montant <= 0) {
+      messageDiv.style.color = "#ffdede";
+      messageDiv.textContent = "⚠️ Veuillez saisir un montant valide.";
+      return;
+    }
+    if (!userNumber) {
+      messageDiv.style.color = "#ffdede";
+      messageDiv.textContent = "⚠️ Veuillez saisir votre numéro de recharge.";
+      return;
+    }
+    if (!transId) {
+      messageDiv.style.color = "#ffdede";
+      messageDiv.textContent = "⚠️ Veuillez saisir l'ID de transaction.";
+      return;
+    }
+
+    messageDiv.style.color = "#b1ffd1";
+    messageDiv.textContent = "💾 Enregistrement en cours...";
+
+    try {
+      const user = auth.currentUser;
+
+      if (!user) {
+        messageDiv.style.color = "#ffdede";
+        messageDiv.textContent = "Vous devez être connecté.";
+        setTimeout(() => (window.location.href = "recharge.html"), 2000);
+        return;
+      }
+
+      // 🔹 Enregistrement dans Firebase
+      const rechargesRef = ref(db, `users/${user.uid}/recharges`);
+      await push(rechargesRef, {
+        numero: userNumber,
+        pays: selectedCountry,
+        operateur: selectedOperator,
+        montant: parseFloat(montant),
+        transactionId: transId,
+        date: new Date().toISOString()
+      });
+
+      messageDiv.style.color = "#b1ffd1";
+      messageDiv.textContent = "✅ Recharge enregistrée avec succès ! Redirection...";
+
+      setTimeout(() => {
+        window.location.href = "historique.html";
+      }, 2500);
+    } catch (error) {
+      console.error(error);
+      messageDiv.style.color = "#ffdede";
+      messageDiv.textContent = "❌ Erreur lors de l'enregistrement : " + error.message;
+    }
+  });
+</script>
+</body>
+</html>

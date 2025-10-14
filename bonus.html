@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Échange de Cadeau</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #a52727, #670909);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container {
+      background-color: rgba(0,0,0,0.6);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 380px;
+      padding: 30px 40px;
+      box-shadow: 0 0 30px rgba(255,255,255,0.15);
+    }
+    h1 {
+      text-align: center;
+      font-weight: 900;
+      font-size: 1.8rem;
+      margin-bottom: 25px;
+      letter-spacing: 0.07em;
+      user-select:none;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    label {
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 8px;
+      user-select:none;
+    }
+    input[type="text"] {
+      padding: 12px 18px;
+      border-radius: 14px;
+      border: none;
+      font-size: 1.1rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      outline: none;
+      transition: background-color 0.3s ease;
+      background-color: rgba(255,255,255,0.1);
+      color: white;
+    }
+    input[type="text"]:focus {
+      background-color: rgba(255,255,255,0.3);
+      color: #b71c1c;
+    }
+    button {
+      padding: 14px 0;
+      background: #b71c1c;
+      border: none;
+      border-radius: 25px;
+      font-size: 1.3rem;
+      font-weight: 900;
+      color: white;
+      cursor: pointer;
+      letter-spacing: 0.12em;
+      transition: background-color 0.3s ease;
+      user-select:none;
+    }
+    button:hover {
+      background: #800909;
+    }
+    #result {
+      margin-top: 18px;
+      font-weight: 700;
+      font-size: 1rem;
+      text-align: center;
+      padding: 12px 15px;
+      border-radius: 12px;
+      display: none;
+      user-select:none;
+    }
+    #result.success {
+      background-color: #a5d6a7;
+      color: #1b4d1b;
+      box-shadow: 0 0 15px #8bc34aaa;
+    }
+    #result.error {
+      background-color: #f48fb1;
+      color: #601427;
+      box-shadow: 0 0 15px #ef5350aa;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" role="main">
+    <h1>Échangez votre Code Cadeau</h1>
+    <form id="redeemForm" aria-describedby="result" novalidate>
+      <label for="giftCodeInput">Code Cadeau</label>
+      <input type="text" id="giftCodeInput" maxlength="10" required aria-required="true" placeholder="Ex: CADEAU1234" pattern="^[a-zA-Z0-9]{8,10}$" />
+      <button type="submit">Valider</button>
+    </form>
+    <div id="result" role="alert" aria-live="assertive"></div>
+  </div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+  import {
+    getAuth,
+    onAuthStateChanged,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword
+  } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+  import {
+    getDatabase,
+    ref,
+    get,
+    set,
+    update,
+    onValue,
+    runTransaction,
+    query,
+    orderByChild,
+    equalTo,
+    push
+  } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+
+  // 🔥 Configuration Firebase (PEPECO)
+  const firebaseConfig = {
+    apiKey: "AIzaSyCaDZQUirunG7CPrMISasgBVlVgkyuISko",
+    authDomain: "pepeco-f6f26.firebaseapp.com",
+    databaseURL: "https://pepeco-f6f26-default-rtdb.firebaseio.com",
+    projectId: "pepeco-f6f26",
+    storageBucket: "pepeco-f6f26.firebasestorage.app",
+    messagingSenderId: "175958489677",
+    appId: "1:175958489677:web:48b339d732e4207d0f7a04"
+  };
+  
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const database = getDatabase(app);
+
+  const form = document.getElementById("redeemForm");
+  const giftCodeInput = document.getElementById("giftCodeInput");
+  const resultEl = document.getElementById("result");
+  let currentUser = null;
+
+  onAuthStateChanged(auth, user => {
+    currentUser = user;
+    if (!user) {
+      showResult("Vous devez être connecté pour échanger un code.", "error");
+      form.querySelector("button").disabled = true;
+    } else {
+      resultEl.style.display = "none";
+      form.querySelector("button").disabled = false;
+    }
+  });
+
+  form.addEventListener("submit", async e => {
+    e.preventDefault();
+    if (!currentUser) {
+      showResult("Vous devez être connecté.", "error");
+      return;
+    }
+
+    const code = giftCodeInput.value.trim().toUpperCase();
+    if (!code) {
+      showResult("Veuillez saisir un code cadeau valide.", "error");
+      return;
+    }
+
+    showResult("Validation du code...", "success");
+
+    try {
+      const codeRef = ref(database, `giftCodes/${code}`);
+      const snapshot = await get(codeRef);
+      if (!snapshot.exists()) {
+        showResult("Code cadeau invalide ou introuvable.", "error");
+        return;
+      }
+      const giftData = snapshot.val();
+
+      // Vérifier que la date de création n'est pas trop ancienne (> 24h)
+      const createdAt = new Date(giftData.createdAt);
+      const now = new Date();
+      const diffMs = now - createdAt;
+      const hours24 = 24 * 60 * 60 * 1000;
+      if (diffMs > hours24) {
+        showResult("Ce code cadeau a expiré et ne peut plus être utilisé.", "error");
+        return;
+      }
+
+      // Vérifier si l'utilisateur actuel a déjà utilisé ce code
+      if (giftData.usedBy && giftData.usedBy[currentUser.uid]) {
+        showResult("Vous avez déjà utilisé ce code cadeau.", "error");
+        return;
+      }
+
+      // Marquer cet utilisateur comme ayant utilisé ce code
+      const userUsedRef = ref(database, `giftCodes/${code}/usedBy/${currentUser.uid}`);
+      await set(userUsedRef, true);
+
+      // Créditer le montant sur le solde de l'utilisateur connecté
+      const userBalanceRef = ref(database, `users/${currentUser.uid}/balance`);
+      await runTransaction(userBalanceRef, current => (current || 0) + giftData.amount);
+
+      showResult(`Code validé ! Montant crédité : FCFA ${giftData.amount}`, "success");
+      form.reset();
+
+    } catch (error) {
+      console.error(error);
+      showResult("Une erreur est survenue, veuillez réessayer.", "error");
+    }
+  });
+
+  function showResult(message, type) {
+    resultEl.textContent = message;
+    resultEl.className = type === "success" ? "success" : "error";
+    resultEl.style.display = "block";
+  }
+</script>
+</body>
+</html>

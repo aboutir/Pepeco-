@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Admin - Recharges en listes cartes</title>
+<style>
+  body {
+    margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #900; color: white;
+    min-height: 100vh; padding: 20px;
+    display: flex; justify-content: center;
+  }
+  .container {
+    max-width: 480px;
+    width: 100%;
+  }
+  h1 {
+    text-align: center;
+    margin-bottom: 24px;
+    font-weight: 900;
+    font-size: 1.8rem;
+    letter-spacing: 0.1em;
+  }
+  .card {
+    background: rgba(255,255,255,0.1);
+    border-radius: 15px;
+    padding: 18px 22px;
+    margin-bottom: 20px;
+    box-shadow: 0 5px 16px rgba(0,0,0,0.6);
+    user-select:none;
+  }
+  .card p {
+    margin: 6px 0;
+    font-weight: 600;
+    font-size: 1rem;
+    word-wrap: break-word;
+  }
+  .label {
+    font-weight: 700;
+  }
+  .status {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 6px 14px;
+    border-radius: 18px;
+    font-weight: 700;
+    font-size: 0.9rem;
+  }
+  .status.approuve {
+    background-color: #8acd8a;
+    color: #174d17;
+  }
+  .status.rejete {
+    background-color: #d46a6a;
+    color: #520000;
+  }
+  .status.enattente {
+    background-color: #ffae42;
+    color: #3a2e00;
+  }
+</style>
+</head>
+<body>
+  <div class="container" role="main" aria-label="Historique des recharges">
+    <h1>Historique des Recharges</h1>
+    <div id="cardsContainer" aria-live="polite">
+      <p style="text-align:center; opacity:0.7;">Chargement des transactions…</p>
+    </div>
+  </div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+  import {
+    getAuth,
+    onAuthStateChanged,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword
+  } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+  import {
+    getDatabase,
+    ref,
+    get,
+    set,
+    update,
+    onValue
+  } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+
+  // 🔥 Configuration Firebase (PEPECO)
+  const firebaseConfig = {
+    apiKey: "AIzaSyCaDZQUirunG7CPrMISasgBVlVgkyuISko",
+    authDomain: "pepeco-f6f26.firebaseapp.com",
+    databaseURL: "https://pepeco-f6f26-default-rtdb.firebaseio.com",
+    projectId: "pepeco-f6f26",
+    storageBucket: "pepeco-f6f26.firebasestorage.app",
+    messagingSenderId: "175958489677",
+    appId: "1:175958489677:web:48b339d732e4207d0f7a04"
+  };
+  
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getDatabase(app);
+  const cardsContainer = document.getElementById('cardsContainer');
+
+  const formatDateTime = timestamp => {
+    if (!timestamp) return '-';
+    const d = new Date(timestamp);
+    return d.toLocaleDateString('fr-FR') + ' ' + d.toLocaleTimeString('fr-FR');
+  };
+
+  const statusMap = {
+    'confirmé': ['Approuvé', 'approuve'],
+    'confirmed': ['Approuvé', 'approuve'],
+    'rejeté': ['Rejeté', 'rejete'],
+    'rejected': ['Rejeté', 'rejete']
+  };
+
+  function createCard(email, recharge) {
+    const card = document.createElement('div');
+    card.className = 'card';
+
+    card.innerHTML = `
+      <p><span class="label">Montant :</span> ${recharge.montant?.toLocaleString() || '-'} FCFA</p>
+      <p><span class="label">Numéro :</span> ${recharge.numero || '-'}</p>
+      <p><span class="label">Opérateur :</span> ${recharge.operateur || '-'}</p>
+      <p><span class="label">Email :</span> ${email || '-'}</p>
+      <p><span class="label">Date :</span> ${formatDateTime(recharge.date || recharge.configuredAt)}</p>
+      <p><span class="label">Traité le :</span> ${formatDateTime(recharge.creditedAt || recharge.rejectedAt) || '-'}</p>
+    `;
+
+    const statusKey = (recharge.status || 'enattente').toLowerCase();
+    const [label, className] = statusMap[statusKey] || ['En attente', 'enattente'];
+
+    const statusSpan = document.createElement('span');
+    statusSpan.className = 'status ' + className;
+    statusSpan.textContent = label;
+
+    card.appendChild(statusSpan);
+
+    // Si rejeté, afficher un motif si présent
+    if (statusKey === 'rejeté' || statusKey === 'rejected') {
+      const motif = recharge.reason || recharge.motif || 'Pas reçu';
+      const motifP = document.createElement('p');
+      motifP.style.marginTop = '8px';
+      motifP.style.fontStyle = 'italic';
+      motifP.style.color = '#ffdede';
+      motifP.textContent = `Motif: ${motif}`;
+      card.appendChild(motifP);
+    }
+
+    return card;
+  }
+
+  function displayCards(data) {
+    cardsContainer.innerHTML = '';
+    if (!data || Object.keys(data).length === 0) {
+      cardsContainer.innerHTML = '<p style="text-align:center; opacity:0.7;">Aucune transaction trouvée.</p>';
+      return;
+    }
+    // Construire la liste de cartes à afficher (toutes les transactions de tous les users)
+    // Récupère d'abord dans un tableau et trie par date descendante
+    let cards = [];
+    for (const uid in data) {
+      const user = data[uid];
+      if (!user.recharges) continue;
+      const email = user.email || "-";
+      for (const rechargeId in user.recharges) {
+        const recharge = user.recharges[rechargeId];
+        cards.push({email, recharge, rechargeId, uid});
+      }
+    }
+
+    cards.sort((a, b) => {
+      const getDate = r => r.recharge.date || r.recharge.configuredAt || 0;
+      return getDate(b) - getDate(a);
+    });
+
+    cards.forEach(item => {
+      const card = createCard(item.email, item.recharge);
+      cardsContainer.appendChild(card);
+    });
+  }
+
+  onAuthStateChanged(auth, user => {
+    if (user) {
+      cardsContainer.innerHTML = '<p style="text-align:center; opacity:0.7;">Chargement des transactions...</p>';
+      get(ref(db, 'users')).then(snapshot => {
+        displayCards(snapshot.val());
+      }).catch(err => {
+        cardsContainer.innerHTML = `<p style="text-align:center; color:#ffdede;">Erreur: ${err.message}</p>`;
+      });
+    } else {
+      cardsContainer.innerHTML = '<p style="text-align:center; color:#ffdede;">Connectez-vous pour accéder.</p>';
+      setTimeout(() => {
+        window.location.href = 'admin-login.html';
+      }, 2000);
+    }
+  });
+</script>
+</body>
+</html>

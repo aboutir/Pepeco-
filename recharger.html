@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Recharge PEPECO</title>
+<style>
+  body {
+    margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #c00000; color: white;
+    display: flex; justify-content: center; align-items: center;
+    min-height: 100vh; padding: 20px;
+  }
+  .container {
+    background: rgba(255,255,255,0.12);
+    padding: 30px 25px 40px 25px; border-radius: 25px;
+    width: 100%; max-width: 420px;
+    box-shadow: 0 0 25px rgba(0,0,0,0.5);
+    box-sizing: border-box;
+  }
+  h1 {
+    text-align: center; font-weight: 700; font-size: 1.8rem; margin-bottom: 22px;
+  }
+  label {
+    font-weight: 600; font-size: 1rem; display: block; margin-bottom: 8px;
+  }
+  select {
+    width: 100%; padding: 12px 15px; border-radius: 15px; border: none;
+    background-color: rgba(255,255,255,0.3); color: white;
+    font-weight: 600; font-size: 1rem; outline: none;
+    cursor: pointer;
+  }
+  select:focus {
+    background-color: rgba(255,255,255,0.6); color: #c00000;
+  }
+  button {
+    margin-top: 30px; width: 100%; padding: 14px;
+    background-color: white; color: #c00000; font-weight: 700;
+    border: none; border-radius: 18px; font-size: 1.2rem;
+    cursor: pointer; transition: background-color 0.3s ease;
+  }
+  button:hover {
+    background-color: #f0f0f0;
+  }
+  #message {
+    margin-top: 20px; font-weight: 600; text-align: center;
+    min-height: 1.4em; color: #ffdede;
+  }
+</style>
+</head>
+<body>
+  <div class="container" role="main" aria-label="Page de recharge PEPECO">
+    <h1>Recharge PEPECO</h1>
+
+    <label for="countrySelect">Veuillez sélectionner votre pays</label>
+    <select id="countrySelect" required>
+      <option value="" disabled selected>Choisir un pays</option>
+      <option value="coteivoire">Côte d'Ivoire</option>
+      <option value="benin">Bénin</option>
+      <option value="togo">Togo</option>
+      <option value="burkinafaso">Burkina Faso</option>
+      <option value="senegal">Sénégal</option>
+      <option value="mali">Mali</option>
+    </select>
+
+    <label for="operatorSelect">Veuillez sélectionner votre opérateur de recharge</label>
+    <select id="operatorSelect" required disabled>
+      <option value="" disabled selected>Sélectionnez d'abord un pays</option>
+    </select>
+
+    <button id="submitBtn" type="button" disabled>Recharger</button>
+
+    <div id="message" aria-live="polite"></div>
+  </div>
+
+  <script>
+    const countrySelect = document.getElementById('countrySelect');
+    const operatorSelect = document.getElementById('operatorSelect');
+    const submitBtn = document.getElementById('submitBtn');
+    const message = document.getElementById('message');
+
+    const countryOperators = {
+      coteivoire: ["MTN Côte d'Ivoire", "Moov Côte d'Ivoire", "Wave Côte d'Ivoire", "Orange Côte d'Ivoire"],
+      benin: ["MTN Bénin", "Moov Bénin"],
+      togo: ["Moov Togo"],
+      burkinafaso: ["MTN Burkina Faso", "Moov Burkina Faso", "Orange Burkina Faso"],
+      senegal: ["Orange Sénégal", "Wave Sénégal"],
+      mali: ["Orange Mali", "Wave Mali"]
+    };
+
+    countrySelect.addEventListener('change', () => {
+      const selectedCountry = countrySelect.value;
+      operatorSelect.innerHTML = "";
+
+      if (!selectedCountry || !countryOperators[selectedCountry]) {
+        operatorSelect.disabled = true;
+        operatorSelect.innerHTML = '<option value="" disabled selected>Sélectionnez d\'abord un pays</option>';
+        submitBtn.disabled = true;
+        return;
+      }
+
+      const operators = countryOperators[selectedCountry];
+      operatorSelect.disabled = false;
+
+      const placeholderOption = document.createElement('option');
+      placeholderOption.disabled = true;
+      placeholderOption.selected = true;
+      placeholderOption.value = "";
+      placeholderOption.textContent = "Choisir un opérateur";
+      operatorSelect.appendChild(placeholderOption);
+
+      operators.forEach(op => {
+        const option = document.createElement('option');
+        option.value = op;
+        option.textContent = op;
+        operatorSelect.appendChild(option);
+      });
+
+      submitBtn.disabled = true;
+      message.textContent = "";
+    });
+
+    operatorSelect.addEventListener('change', () => {
+      submitBtn.disabled = !operatorSelect.value;
+      message.textContent = "";
+    });
+
+    submitBtn.addEventListener('click', () => {
+      if (!countrySelect.value) {
+        message.textContent = "Veuillez sélectionner un pays.";
+        return;
+      }
+      if (!operatorSelect.value) {
+        message.textContent = "Veuillez sélectionner un opérateur.";
+        return;
+      }
+      const params = new URLSearchParams({
+        country: countrySelect.value,
+        operator: operatorSelect.value
+      });
+      window.location.href = "confirmation.html?" + params.toString();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Retrait PEPECO</title>
+<style>
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #c00000; /* Rouge vif */
+    color: white;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  header {
+    text-align: center;
+    padding: 20px 15px;
+    font-size: 1.3rem;
+    font-weight: 300;
+    letter-spacing: 0.12em;
+    user-select: none;
+    text-transform: uppercase;
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.3);
+    font-family: 'Segoe UI Light', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+  form {
+    width: 340px;
+    padding: 0;
+    box-sizing: border-box;
+    color: white;
+  }
+  .form-group {
+    margin-bottom: 30px;
+    position: relative;
+  }
+  label {
+    display: block;
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 6px;
+    color: #fff;
+    letter-spacing: 0.03em;
+  }
+  input[type="number"],
+  input[type="password"] {
+    width: 100%;
+    padding: 10px 0 8px 0;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid #fff;
+    font-size: 1rem;
+    color: white;
+    font-weight: 600;
+    outline: none;
+    transition: border-color 0.3s ease;
+  }
+  input[type="number"]::placeholder,
+  input[type="password"]::placeholder {
+    color: #ffdedc;
+    font-weight: 400;
+  }
+  input[type="number"]:focus,
+  input[type="password"]:focus {
+    border-bottom-color: #ff8a80;
+    color: #fff;
+  }
+  #message {
+    margin-bottom: 15px;
+    min-height: 22px;
+    font-weight: 600;
+  }
+  .error {
+    color: #ff4d4d;
+  }
+  .success {
+    color: #d4f5d4;
+  }
+  input#withdrawal-button {
+    margin-top: 10px;
+    background-color: white;
+    color: #c00000;
+    font-weight: bold;
+    font-size: 1.15rem;
+    border: none;
+    padding: 12px 0;
+    width: 100%;
+    border-radius: 10px;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    transition: background-color 0.3s ease;
+  }
+  input#withdrawal-button:disabled {
+    background-color: #f8f8f8;
+    color: #bbbbbb;
+    cursor: not-allowed;
+  }
+  input#withdrawal-button:hover:not(:disabled) {
+    background-color: #f7f7f7;
+  }
+  #current-balance {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+    letter-spacing: 0.02em;
+    user-select: none;
+  }
+  #withdrawal-summary {
+    display: none;
+    background: white;
+    color: #c00000;
+    border-radius: 10px;
+    padding: 12px 20px;
+    margin-top: 20px;
+    font-weight: 600;
+    font-size: 1rem;
+  }
+  #withdrawal-summary.visible {
+    display: block;
+  }
+  footer {
+    background-color: transparent;
+    color: black;
+    font-size: 1rem;
+    padding: 18px 25px;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    letter-spacing: 0.02em;
+    box-sizing: border-box;
+    width: 100%;
+  }
+  footer div {
+    flex: 1 1 45%;
+    margin: 5px 0;
+  }
+  .info-left {
+    text-align: left;
+  }
+  .info-right {
+    text-align: right;
+  }
+  @media (max-width: 480px) {
+    form {
+      width: 90%;
+    }
+    footer {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    footer div {
+      flex: none;
+      width: 100%;
+      margin: 5px 0;
+    }
+  }
+</style>
+</head>
+<body>
+<header>Retrait d'argent PEPECO</header>
+<main>
+  <form id="retraitForm" onsubmit="return false;">
+    <div id="message"></div>
+    <div id="current-balance">Chargement du solde...</div>
+    <div class="form-group">
+      <label for="amount">Veuillez saisir le montant à retirer</label>
+      <input type="number" id="amount" name="amount" min="1000" placeholder="Ex : 10 000 FCFA" required />
+    </div>
+    <div class="form-group">
+      <label for="withdrawalCode">Veuillez saisir le code de retrait</label>
+      <input type="password" id="withdrawalCode" name="withdrawalCode" placeholder="Code de retrait" required />
+    </div>
+    <input type="submit" id="withdrawal-button" value="Valider le retrait" disabled />
+    <div id="withdrawal-summary">
+      <div>Montant demandé : <span id="requested-amount"></span></div>
+      <div>Frais (20%) : <span id="fees-amount"></span></div>
+      <div>Montant net à recevoir : <span id="total-amount"></span></div>
+    </div>
+  </form>
+</main>
+<footer>
+  <div class="info-left">
+   1- Minimum de retrait est de 1 000 FCFA<br />
+  2-  Les frais de retrait sont de 20%<br />
+  3-  Retrait automatique très rapide
+    <br />4-L'entreprise pepeco accepte votre  votre retraite 24H/24 et 7J/7.
+    
+    <br />-5 Assuré vous de bien vouloir lié votre compte de retrait en car d'erreur votre retrait sera rejetée  votre code de retrait doivent être a 6 chiffre .
+    
+  </div>
+  
+</footer>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+  import {
+    getAuth,
+    onAuthStateChanged,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword
+  } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+  import {
+    getDatabase,
+    ref,
+    get,
+    set
+  } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+
+  // 🔥 Configuration Firebase (PEPECO)
+  const firebaseConfig = {
+    apiKey: "AIzaSyCaDZQUirunG7CPrMISasgBVlVgkyuISko",
+    authDomain: "pepeco-f6f26.firebaseapp.com",
+    databaseURL: "https://pepeco-f6f26-default-rtdb.firebaseio.com",
+    projectId: "pepeco-f6f26",
+    storageBucket: "pepeco-f6f26.firebasestorage.app",
+    messagingSenderId: "175958489677",
+    appId: "1:175958489677:web:48b339d732e4207d0f7a04"
+  };
+  
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const database = getDatabase(app);
+
+  const MIN_WITHDRAWAL = 1000;
+  const FEE_RATE = 0.20; // correspond au script importé
+  const MAX_WITHDRAWAL = 50000;
+
+  let currentBalance = 0;
+  let currentUser = null;
+  let userWithdrawalConfig = null;
+
+  function formatAmount(amount) {
+    return amount.toLocaleString('fr-FR') + ' FCFA';
+  }
+
+  function showMessage(msg, isError = true) {
+    const el = document.getElementById('message');
+    el.innerHTML = `<div class="${isError ? 'error' : 'success'}">${msg}</div>`;
+  }
+
+  function isValidWithdrawalTime() {
+    return true; // comme demandé (retraits possibles 24/7)
+  }
+
+  async function loadUserData(uid) {
+    try {
+      const userRef = ref(database, `users/${uid}`);
+      const snapshot = await get(userRef);
+      if (snapshot.exists()) {
+        const userData = snapshot.val();
+        currentBalance = userData.balance || 0;
+        userWithdrawalConfig = userData.withdrawalConfig || null;
+        document.getElementById("current-balance").textContent = `Solde actuel : ${formatAmount(currentBalance)}`;
+      } else {
+        document.getElementById("current-balance").textContent = "Utilisateur inconnu";
+      }
+    } catch (error) {
+      console.error("Erreur chargement données:", error);
+      showMessage("Erreur chargement données");
+    }
+  }
+
+  function validateWithdrawalCode(inputCode) {
+    return userWithdrawalConfig && userWithdrawalConfig.code === inputCode;
+  }
+
+  function updateWithdrawalSummary() {
+    const amountInput = document.getElementById("amount");
+    const codeInput = document.getElementById("withdrawalCode");
+    const summary = document.getElementById("withdrawal-summary");
+    const button = document.getElementById("withdrawal-button");
+    const amount = parseFloat(amountInput.value) || 0;
+    const withdrawalCode = codeInput.value.trim();
+
+    const validTime = isValidWithdrawalTime();
+    const validAmount = amount >= MIN_WITHDRAWAL && amount <= MAX_WITHDRAWAL;
+    const sufficientBalance = amount <= currentBalance;
+    const hasCode = withdrawalCode.length > 0;
+
+    button.disabled = !(validTime && validAmount && sufficientBalance && hasCode);
+
+    if (!validTime) {
+      showMessage("Les retraits sont autorisés à tout moment", false);
+    } else if (!validAmount) {
+      showMessage(`Le montant doit être compris entre ${MIN_WITHDRAWAL} et ${MAX_WITHDRAWAL} FCFA`);
+    } else if (!sufficientBalance) {
+      showMessage("Solde insuffisant");
+    } else if (!hasCode) {
+      showMessage("Veuillez saisir votre code de retrait");
+    } else {
+      showMessage("", false);
+    }
+
+    if (amount > 0) {
+      const fees = Math.round(amount * FEE_RATE);
+      const total = amount - fees;
+
+      document.getElementById("requested-amount").textContent = formatAmount(amount);
+      document.getElementById("fees-amount").textContent = formatAmount(fees);
+      document.getElementById("total-amount").textContent = formatAmount(total);
+
+      summary.classList.add("visible");
+    } else {
+      summary.classList.remove("visible");
+    }
+  }
+
+  async function processWithdrawal() {
+    if (!currentUser) {
+      showMessage("Veuillez vous connecter");
+      return;
+    }
+
+    if (!isValidWithdrawalTime()) {
+      showMessage("Les retraits sont autorisés à tout moment");
+      return;
+    }
+
+    const amount = parseFloat(document.getElementById("amount").value);
+    const withdrawalCode = document.getElementById("withdrawalCode").value.trim();
+
+    if (!validateWithdrawalCode(withdrawalCode)) {
+      showMessage("Code de retrait incorrect");
+      return;
+    }
+
+    if (isNaN(amount) || amount < MIN_WITHDRAWAL || amount > MAX_WITHDRAWAL) {
+      showMessage("Montant invalide");
+      return;
+    }
+
+    if (amount > currentBalance) {
+      showMessage("Solde insuffisant");
+      return;
+    }
+
+    const fees = Math.round(amount * FEE_RATE);
+    const totalAmount = amount - fees;
+    const newBalance = currentBalance - amount;
+
+    try {
+      const updates = {};
+      updates[`users/${currentUser.uid}/balance`] = newBalance;
+
+      const historyRef = ref(database, `users/${currentUser.uid}/withdrawalHistory`);
+      const newKey = push(historyRef).key;
+
+      updates[`users/${currentUser.uid}/withdrawalHistory/${newKey}`] = {
+        amount,
+        fees,
+        totalAmount,
+        timestamp: serverTimestamp(),
+        status: "Traitement Bancaire"
+      };
+
+      await update(ref(database), updates);
+
+      window.location.href = "historique-retrait.html";
+    } catch (error) {
+      console.error("Erreur retrait:", error);
+      showMessage("Erreur lors du retrait. Réessayez.");
+    }
+  }
+
+  onAuthStateChanged(auth, (user) => {
+    currentUser = user;
+    if (user) {
+      loadUserData(user.uid);
+    } else {
+      document.getElementById("current-balance").textContent = "Non connecté";
+      showMessage("Connectez-vous pour effectuer un retrait");
+      document.getElementById("withdrawal-button").disabled = true;
+    }
+  });
+
+  document.getElementById("amount").addEventListener("input", updateWithdrawalSummary);
+  document.getElementById("withdrawalCode").addEventListener("input", updateWithdrawalSummary);
+  document.getElementById("withdrawal-button").addEventListener("click", processWithdrawal);
+
+  showMessage("", false);
+</script>
+</body>
+</html>

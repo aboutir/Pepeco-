@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Page d'Investissement pepeco</title>
+  <style>
+    :root {
+      --red-bg: #d01818;
+      --red-bg-gradient: linear-gradient(135deg, #d01818, #a21010);
+      --green: #61B604;
+      --green-dark: #5aaf04;
+      --white: #ffffff;
+      --radius: 16px;
+      --padding: 16px;
+      --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: var(--font-family);
+      background: var(--red-bg-gradient);
+      color: var(--white);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      padding: 40px 15px 80px;
+      align-items: center;
+    }
+    .offre {
+      background-color: rgba(255 255 255 / 0.95);
+      border-radius: var(--radius);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.3);
+      width: 100%;
+      max-width: 420px;
+      margin-bottom: 30px;
+      padding: var(--padding);
+      color: #000;
+      user-select: none;
+      display: flex;
+      gap: 18px;
+      align-items: center;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .offre:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.45);
+    }
+    .offre img {
+      width: 110px;
+      height: 110px;
+      object-fit: cover;
+      border-radius: var(--radius);
+      flex-shrink: 0;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+    }
+    .details-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .nom-offre {
+      font-weight: 800;
+      font-size: 22px;
+      color: #111;
+      margin-top: 0;
+      margin-bottom: 4px;
+      letter-spacing: 0.02em;
+    }
+    .prix {
+      color: var(--green);
+      font-weight: 700;
+      font-size: 18px;
+      margin-bottom: 14px;
+    }
+    .details {
+      display: flex;
+      justify-content: space-between;
+      font-size: 15px;
+      color: #333;
+    }
+    .acheter-btn {
+      background-color: var(--green);
+      border: none;
+      border-radius: 20px;
+      padding: 14px 0;
+      font-size: 18px;
+      font-weight: 800;
+      color: white;
+      cursor: pointer;
+      margin-top: 18px;
+      width: 100%;
+      max-width: 420px;
+      user-select: none;
+      box-shadow: 0 8px 24px rgba(97, 182, 4, 0.7);
+      transition: background-color 0.3s, box-shadow 0.3s;
+      letter-spacing: 0.05em;
+    }
+    .acheter-btn:hover {
+      background-color: #4c8b01;
+      box-shadow: 0 12px 30px rgba(76, 139, 1, 0.9);
+    }
+    nav.bottom-nav {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      z-index: 1000;
+      margin-top: auto;
+      display: flex;
+      background-color: var(--green);
+      color: var(--white);
+      font-weight: 700;
+      font-size: 16px;
+      border-radius: var(--radius) var(--radius) 0 0;
+      overflow: hidden;
+      user-select: none;
+    }
+    nav.bottom-nav a {
+      flex: 1;
+      text-align: center;
+      padding: 14px 0;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      color: inherit;
+      text-decoration: none;
+    }
+    nav.bottom-nav a.active {
+      background-color: var(--white);
+      color: var(--green);
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+    nav.bottom-nav a:not(.active):hover {
+      background-color: #87d544;
+    }
+    nav.bottom-nav svg {
+      width: 24px;
+      height: 24px;
+      fill: currentColor;
+    }
+    /* Instruction pour le lock notice */
+    .lock-notice {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #d01818;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .lock-notice p {
+      margin: 0;
+      font-size: 13px;
+      color: #a21010;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="offre">
+    <img src="https://image.noelshack.com/fichiers/2025/41/6/1760179383-mocassin-ete-cuir-graine-marron-pour-homme-503br-2.jpg" alt="Omni One VR1" />
+    <div class="details-container">
+      <h2 class="nom-offre">Chaussures</h2>
+      <div class="prix">FCFA 2,500</div>
+      <div class="details"><span>Durée :</span><span>70 jours</span></div>
+      <div class="details"><span>Gain par jours :</span><span>FCFA 380</span></div>
+      <div class="details"><span>Revenus total :</span><span>FCFA 26,600</span></div>
+      <button class="acheter-btn buy-button" data-product-id="1" data-price="2500">Investir maintenant</button>
+    </div>
+  </div>
+
+  <div class="offre">
+    <img src="https://image.noelshack.com/fichiers/2025/41/6/1760179492-nature-morte-chemises-classiques-cintre-23-2150828629.jpg" alt="Omni One VR2" />
+    <div class="details-container">
+      <h2 class="nom-offre">Habille</h2>
+      <div class="prix">FCFA 5,800</div>
+      <div class="details"><span>Durée :</span><span>70 jours</span></div>
+      <div class="details"><span>Gain par jours :</span><span>FCFA 900</span></div>
+      <div class="details"><span>Revenus total :</span><span>FCFA 63,000</span></div>
+      <button class="acheter-btn buy-button" data-product-id="2" data-price="5800">Investir maintenant</button>
+    </div>
+  </div>
+
+  <div class="offre">
+    <img src="https://image.noelshack.com/fichiers/2025/41/6/1760179668-images-2.jpeg" alt="Omni One VR3" />
+    <div class="details-container">
+      <h2 class="nom-offre">Chapeau</h2>
+      <div class="prix">FCFA 17,000</div>
+      <div class="details"><span>Durée :</span><span>70 jours</span></div>
+      <div class="details"><span>Gain par jours :</span><span>FCFA 3,100</span></div>
+      <div class="details"><span>Revenus total :</span><span>FCFA 217,000</span></div>
+      <button class="acheter-btn buy-button" data-product-id="3" data-price="17000">Investir maintenant</button>
+    </div>
+  </div>
+
+  <div class="offre">
+    <img src="https://image.noelshack.com/fichiers/2025/41/6/1760179812-whatsappimage2024-02-26at14-05-37-2-1024x1024.jpg" alt="Omni One VR4" />
+    <div class="details-container">
+      <h2 class="nom-offre">Sac</h2>
+      <div class="prix">FCFA 48,000</div>
+      <div class="details"><span>Durée :</span><span>70 jours</span></div>
+      <div class="details"><span>Gain par jours :</span><span>FCFA 7,100</span></div>
+      <div class="details"><span>Revenus total :</span><span>FCFA 497,000</span></div>
+      <button class="acheter-btn buy-button" data-product-id="5" data-price="48000">Investir maintenant</button>
+    </div>
+  </div>
+
+  <div class="offre">
+    <img src="https://image.noelshack.com/fichiers/2025/41/6/1760179910-une-cravate-sur-le-fond-blanc-17205221.jpg" alt="Omni One VR5" />
+    <div class="details-container">
+      <h2 class="nom-offre">Gravatte</h2>
+      <div class="prix">FCFA 100,000</div>
+      <div class="details"><span>Durée :</span><span>70 jours</span></div>
+      <div class="details"><span>Gain par jours :</span><span>FCFA 18,100</span></div>
+      <div class="details"><span>Revenus total :</span><span>FCFA 1,267,000</span></div>
+      <button class="acheter-btn buy-button" data-product-id="6" data-price="100000">Investir maintenant</button>
+    </div>
+  </div>
+
+  <div class="offre">
+    <img src="https://image.noelshack.com/fichiers/2025/41/6/1760180029-550x548.jpg" alt="Omni One VR6" />
+    <div class="details-container">
+      <h2 class="nom-offre">Montre</h2>
+      <div class="prix">FCFA 280,000</div>
+      <div class="details"><span>Durée :</span><span>70 jours</span></div>
+      <div class="details"><span>Gain par jours :</span><span>FCFA 48,100</span></div>
+      <div class="details"><span>Revenus total :</span><span>FCFA 3,367,000</span></div>
+      <button class="acheter-btn buy-button" data-product-id="7" data-price="280000">Investir maintenant</button>
+    </div>
+  </div>
+
+  <nav class="bottom-nav" role="navigation" aria-label="Navigation principale">
+    <a href="accueil.html" class="active" aria-current="page">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      Accueil
+    </a>
+    <a href="appareil.html">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 6H4v12h16V6z"/></svg>
+      Article 
+    </a>
+    <a href="equipe.html">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z"/></svg>
+      Équipe
+    </a>
+    <a href="solde.html">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4v-1H8v1c0 2.21 1.79 4 4 4z"/></svg>
+      Moi
+    </a>
+  </nav>
+
+  <!-- Intégration du script Firebase -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+  import {
+    getAuth,
+    onAuthStateChanged,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword
+  } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+  import {
+    getDatabase,
+    ref,
+    get,
+    set,
+    update,
+    onValue,
+    runTransaction,
+    query,
+    orderByChild,
+    equalTo,
+    push
+  } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+
+  // 🔥 Configuration Firebase (PEPECO)
+  const firebaseConfig = {
+    apiKey: "AIzaSyCaDZQUirunG7CPrMISasgBVlVgkyuISko",
+    authDomain: "pepeco-f6f26.firebaseapp.com",
+    databaseURL: "https://pepeco-f6f26-default-rtdb.firebaseio.com",
+    projectId: "pepeco-f6f26",
+    storageBucket: "pepeco-f6f26.firebasestorage.app",
+    messagingSenderId: "175958489677",
+    appId: "1:175958489677:web:48b339d732e4207d0f7a04"
+  };
+  
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getDatabase(app);
+
+  let currentUser = null;
+  let userBalance = 0;
+
+  // Strictement utilisé pour limiter à 1 achat par produit
+  const PRODUCT_LIMITS = {
+    1: 1,
+    2: 1,
+    3: 1,
+    5: 1,
+    6: 1,
+    7: 1,
+  };
+
+  function showNotification(message, type) {
+    const notification = document.querySelector('.notification');
+    if (!notification) {
+      alert(message); // fallback
+      return;
+    }
+    notification.textContent = message;
+    notification.style.display = 'block';
+    notification.style.backgroundColor = (type === 'success') ? '#4CAF50' : '#f44336';
+    notification.style.color = 'white';
+    notification.style.padding = '10px';
+    notification.style.borderRadius = '5px';
+    notification.style.position = 'fixed';
+    notification.style.top = '20px';
+    notification.style.right = '20px';
+    notification.style.zIndex = '1000';
+    setTimeout(() => {
+      notification.style.display = 'none';
+    }, 3000);
+  }
+
+  async function checkActiveInvestments(userId, productId) {
+    try {
+      const investmentsRef = ref(db, `investments/${userId}`);
+      const snapshot = await get(investmentsRef);
+      if (!snapshot.exists()) return 0;
+      let activeCount = 0;
+      Object.values(snapshot.val()).forEach(investment => {
+        if (investment.productId == productId && investment.status === 'active' && (investment.remainingDays > 0 || !investment.hasOwnProperty('remainingDays'))) {
+          activeCount++;
+        }
+      });
+      return activeCount;
+    } catch (error) {
+      console.error('Erreur lors de la vérification des investissements:', error);
+      return 0;
+    }
+  }
+
+  async function updateInvestmentLimits(userId) {
+    if (!userId) return;
+    try {
+      for (const productId in PRODUCT_LIMITS) {
+        const activeInvestments = await checkActiveInvestments(userId, Number(productId));
+        const remainingPurchases = PRODUCT_LIMITS[productId] - activeInvestments;
+        const investBtns = document.querySelectorAll(`.buy-button[data-product-id="${productId}"]`);
+        investBtns.forEach(investBtn => {
+          if (remainingPurchases <= 0) {
+            investBtn.disabled = true;
+            investBtn.textContent = 'Limite atteinte';
+            investBtn.style.backgroundColor = '#999';
+            investBtn.style.cursor = 'not-allowed';
+          } else {
+            investBtn.disabled = false;
+            investBtn.textContent = 'Investir maintenant';
+            investBtn.style.backgroundColor = '';
+            investBtn.style.cursor = 'pointer';
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour des limites:', error);
+    }
+  }
+
+  async function investProduct(productId, amount) {
+    if (!currentUser) {
+      showNotification("Veuillez vous connecter pour investir", "error");
+      return;
+    }
+
+    try {
+      // Trouver le conteneur .offre correspondant au produit cliqué via data-product-id
+      const offerElement = document.querySelector(`.buy-button[data-product-id="${productId}"]`).closest('.offre');
+      if (!offerElement) {
+        showNotification("Offre introuvable", "error");
+        return;
+      }
+
+      // Extraire les données depuis le HTML affiché
+      // Durée (en jours)
+      const dureeEl = Array.from(offerElement.querySelectorAll('.details span')).find(el => el.textContent.trim() === 'Durée :');
+      let duree = null;
+      if (dureeEl) {
+        const dureeText = dureeEl.nextElementSibling.textContent.trim();
+        duree = parseInt(dureeText, 10);
+      }
+      // Gain par jour
+      const gainEl = Array.from(offerElement.querySelectorAll('.details span')).find(el => el.textContent.trim() === 'Gain par jours :');
+      let dailyRevenue = null;
+      if (gainEl) {
+        const gainText = gainEl.nextElementSibling.textContent.trim(); // Ex: "FCFA 380"
+        dailyRevenue = parseInt(gainText.replace(/[^0-9]/g, ''), 10);
+      }
+      // Revenu total
+      const revenuEl = Array.from(offerElement.querySelectorAll('.details span')).find(el => el.textContent.trim() === 'Revenus total :');
+      let totalRevenue = null;
+      if (revenuEl) {
+        const revenuText = revenuEl.nextElementSibling.textContent.trim();
+        totalRevenue = parseInt(revenuText.replace(/[^0-9]/g, ''), 10);
+      }
+
+      if (duree === null || dailyRevenue === null || totalRevenue === null) {
+        showNotification("Données du produit invalides", "error");
+        return;
+      }
+
+      // Vérifier la limite d'investissement
+      const activeInvestments = await checkActiveInvestments(currentUser.uid, Number(productId));
+      if (activeInvestments >= PRODUCT_LIMITS[productId]) {
+        showNotification("Vous avez atteint la limite d'achat pour ce produit", "error");
+        return;
+      }
+
+      if (userBalance < amount) {
+        showNotification("Solde insuffisant pour cet investissement", "error");
+        return;
+      }
+
+      const currentDate = new Date();
+      const endDate = new Date(currentDate.getTime() + duree * 24 * 60 * 60 * 1000);
+
+      const updates = {};
+      updates[`users/${currentUser.uid}/balance`] = userBalance - amount;
+      updates[`users/${currentUser.uid}/totalInvestments`] = (await getUserTotalInvestments(currentUser.uid)) + amount;
+      const newInvestmentRef = push(ref(db, `investments/${currentUser.uid}`));
+      updates[`investments/${currentUser.uid}/${newInvestmentRef.key}`] = {
+        productId: Number(productId),
+        amount,
+        startDate: currentDate.toISOString(),
+        endDate: endDate.toISOString(),
+        status: 'active',
+        remainingDays: duree,
+        dailyRevenue,
+        totalRevenue,
+        collectedRevenue: 0,
+        lastCollection: currentDate.toISOString(),
+        timestamp: Date.now()
+      };
+
+      await update(ref(db), updates);
+      userBalance -= amount;
+      await updateInvestmentLimits(currentUser.uid);
+      showNotification("Investissement réussi!", "success");
+      setTimeout(() => {
+        window.location.href = 'machine.html';
+      }, 2000);
+    } catch (error) {
+      console.error("Erreur lors de l'investissement:", error);
+      showNotification("Une erreur est survenue lors de l'investissement", "error");
+    }
+  }
+
+  async function getUserTotalInvestments(userId) {
+    try {
+      const userRef = ref(db, `users/${userId}`);
+      const snapshot = await get(userRef);
+      return snapshot.exists() ? (snapshot.val().totalInvestments || 0) : 0;
+    } catch (error) {
+      console.error('Erreur lors de la récupération du total des investissements:', error);
+      return 0;
+    }
+  }
+
+  function initializeEventListeners() {
+    const buttons = document.querySelectorAll('.buy-button');
+    buttons.forEach(button => {
+      button.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const productId = button.getAttribute('data-product-id');
+        const price = parseInt(button.getAttribute('data-price'));
+        if (productId && price) {
+          await investProduct(productId, price);
+        }
+      });
+    });
+  }
+
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      currentUser = user;
+      try {
+        const userRef = ref(db, `users/${user.uid}`);
+        const snapshot = await get(userRef);
+        if (snapshot.exists()) {
+          userBalance = snapshot.val().balance || 0;
+          await updateInvestmentLimits(user.uid);
+          initializeEventListeners();
+          console.log(`Utilisateur connecté: ${user.email}, Solde: ${userBalance} FCFA`);
+        } else {
+          showNotification("Erreur lors du chargement du profil utilisateur", "error");
+        }
+      } catch (error) {
+        console.error('Erreur lors du chargement des données utilisateur:', error);
+        showNotification("Erreur lors du chargement des données", "error");
+      }
+    } else {
+      currentUser = null;
+      userBalance = 0;
+      window.location.href = 'login.html';
+    }
+  });
+
+  window.investProduct = investProduct;
+</script>
+
+</body>
+</html>

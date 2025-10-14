@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Infos Portefeuille PEPECO</title>
+<style>
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #c00000;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+  }
+  h1 {
+    margin-bottom: 30px;
+    font-weight: 700;
+    font-size: 2rem;
+    letter-spacing: 0.1em;
+    user-select: none;
+  }
+  .card {
+    background: linear-gradient(135deg, #f44336 0%, #b71c1c 100%);
+    border-radius: 30px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+    width: 350px;
+    padding: 30px 30px 40px 30px;
+    box-sizing: border-box;
+    color: white;
+    font-weight: 600;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .card h2 {
+    margin: 0 0 20px 0;
+    font-weight: 900;
+    font-size: 1.5rem;
+    letter-spacing: 0.1em;
+    text-align: center;
+  }
+  .field {
+    display: flex;
+    flex-direction: column;
+  }
+  .label {
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 6px;
+    user-select: none;
+  }
+  .value {
+    font-size: 1.2rem;
+    font-weight: 700;
+    word-break: break-word;
+  }
+  #message {
+    text-align: center;
+    font-weight: 600;
+    font-size: 1rem;
+    color: #ffdede;
+    min-height: 1.4em;
+    margin-bottom: 15px;
+    user-select: none;
+  }
+</style>
+</head>
+<body>
+
+<div>
+  <h1>Portefeuille PEPECO</h1>
+  <div id="message" aria-live="polite"></div>
+  <div class="card" role="region" aria-label="Carte des informations du portefeuille">
+    <h2>Informations du compte</h2>
+    <div class="field">
+      <div class="label">Propriétaire</div>
+      <div class="value" id="ownerInfo">Chargement...</div>
+    </div>
+    <div class="field">
+      <div class="label">Numéro de téléphone</div>
+      <div class="value" id="phoneInfo">Chargement...</div>
+    </div>
+    <div class="field">
+      <div class="label">Opérateur</div>
+      <div class="value" id="operatorInfo">Chargement...</div>
+    </div>
+    <div class="field">
+      <div class="label">Date de configuration</div>
+      <div class="value" id="linkDate">Chargement...</div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+  import {
+    getAuth,
+    onAuthStateChanged,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword
+  } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+  import {
+    getDatabase,
+    ref,
+    get,
+    set,
+    update,
+    onValue,
+    runTransaction,
+    query,
+    orderByChild,
+    equalTo,
+    push
+  } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+
+  // 🔥 Configuration Firebase (PEPECO)
+  const firebaseConfig = {
+    apiKey: "AIzaSyCaDZQUirunG7CPrMISasgBVlVgkyuISko",
+    authDomain: "pepeco-f6f26.firebaseapp.com",
+    databaseURL: "https://pepeco-f6f26-default-rtdb.firebaseio.com",
+    projectId: "pepeco-f6f26",
+    storageBucket: "pepeco-f6f26.firebasestorage.app",
+    messagingSenderId: "175958489677",
+    appId: "1:175958489677:web:48b339d732e4207d0f7a04"
+  };
+  
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+
+const formatPhoneNumber = phone => {
+  if (!phone) return '-';
+  return phone.replace(/(\d{2})(?=\d)/g, "$1 ");
+};
+
+const formatDate = timestamp => {
+  if (!timestamp) return '-';
+  const date = new Date(timestamp);
+  return date.toLocaleDateString('fr-FR', {day:'2-digit',month:'2-digit',year:'numeric'});
+};
+
+const showMessage = (text, type = 'error') => {
+  const messageDiv = document.getElementById('message');
+  messageDiv.textContent = text;
+  messageDiv.style.color = type === 'error' ? '#ffdede' : '#b1ffd1';
+  messageDiv.style.display = text ? 'block' : 'none';
+};
+
+const displayAccountInfo = async (user) => {
+  try {
+    const snapshot = await get(ref(db, `users/${user.uid}/withdrawalConfig`));
+    const data = snapshot.val();
+
+    if (data) {
+      document.getElementById('ownerInfo').textContent = data.ownerName || 'Non spécifié';
+      document.getElementById('phoneInfo').textContent = formatPhoneNumber(data.phone) || '-';
+      document.getElementById('operatorInfo').textContent = data.operator || '-';
+      document.getElementById('linkDate').textContent = formatDate(data.configuredAt) || '-';
+      showMessage('', 'success');
+    } else {
+      showMessage('Aucune donnée liée trouvée', 'error');
+      ['ownerInfo','phoneInfo','operatorInfo','linkDate'].forEach(id=> {
+        document.getElementById(id).textContent = '-';
+      });
+    }
+  } catch (error) {
+    showMessage(`Erreur: ${error.message}`, 'error');
+    console.error('Erreur lors du chargement:', error);
+  }
+};
+
+onAuthStateChanged(auth, user => {
+  if (user) {
+    displayAccountInfo(user);
+  } else {
+    showMessage("Utilisateur non connecté, redirection...", 'error');
+    setTimeout(() => window.location.href = 'retrait.html', 2000);
+  }
+});
+</script>
+
+</body>
+</html>
