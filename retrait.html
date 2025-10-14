@@ -213,7 +213,10 @@
     getDatabase,
     ref,
     get,
-    set
+    set,
+    update,
+    push,
+    serverTimestamp
   } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
 
   // 🔥 Configuration Firebase (PEPECO)
@@ -232,11 +235,11 @@
   const database = getDatabase(app);
 
   const MIN_WITHDRAWAL = 1000;
-  const FEE_RATE = 0.20; // correspond au script importé
   const MAX_WITHDRAWAL = 50000;
+  const FEE_RATE = 0.20;
 
-  let currentBalance = 0;
   let currentUser = null;
+  let currentBalance = 0;
   let userWithdrawalConfig = null;
 
   function formatAmount(amount) {
@@ -245,11 +248,11 @@
 
   function showMessage(msg, isError = true) {
     const el = document.getElementById('message');
-    el.innerHTML = `<div class="${isError ? 'error' : 'success'}">${msg}</div>`;
+    if (el) el.innerHTML = `<div class="${isError ? 'error' : 'success'}">${msg}</div>`;
   }
 
   function isValidWithdrawalTime() {
-    return true; // comme demandé (retraits possibles 24/7)
+    return true; // retraits 24/7
   }
 
   async function loadUserData(uid) {
@@ -260,9 +263,11 @@
         const userData = snapshot.val();
         currentBalance = userData.balance || 0;
         userWithdrawalConfig = userData.withdrawalConfig || null;
-        document.getElementById("current-balance").textContent = `Solde actuel : ${formatAmount(currentBalance)}`;
+        const balanceEl = document.getElementById("current-balance");
+        if (balanceEl) balanceEl.textContent = `Solde actuel : ${formatAmount(currentBalance)}`;
       } else {
-        document.getElementById("current-balance").textContent = "Utilisateur inconnu";
+        const balanceEl = document.getElementById("current-balance");
+        if (balanceEl) balanceEl.textContent = "Utilisateur inconnu";
       }
     } catch (error) {
       console.error("Erreur chargement données:", error);
@@ -279,6 +284,8 @@
     const codeInput = document.getElementById("withdrawalCode");
     const summary = document.getElementById("withdrawal-summary");
     const button = document.getElementById("withdrawal-button");
+    if (!amountInput || !codeInput || !summary || !button) return;
+
     const amount = parseFloat(amountInput.value) || 0;
     const withdrawalCode = codeInput.value.trim();
 
@@ -305,9 +312,13 @@
       const fees = Math.round(amount * FEE_RATE);
       const total = amount - fees;
 
-      document.getElementById("requested-amount").textContent = formatAmount(amount);
-      document.getElementById("fees-amount").textContent = formatAmount(fees);
-      document.getElementById("total-amount").textContent = formatAmount(total);
+      const requestedEl = document.getElementById("requested-amount");
+      const feesEl = document.getElementById("fees-amount");
+      const totalEl = document.getElementById("total-amount");
+
+      if (requestedEl) requestedEl.textContent = formatAmount(amount);
+      if (feesEl) feesEl.textContent = formatAmount(fees);
+      if (totalEl) totalEl.textContent = formatAmount(total);
 
       summary.classList.add("visible");
     } else {
@@ -321,13 +332,12 @@
       return;
     }
 
-    if (!isValidWithdrawalTime()) {
-      showMessage("Les retraits sont autorisés à tout moment");
-      return;
-    }
+    const amountInput = document.getElementById("amount");
+    const codeInput = document.getElementById("withdrawalCode");
+    if (!amountInput || !codeInput) return;
 
-    const amount = parseFloat(document.getElementById("amount").value);
-    const withdrawalCode = document.getElementById("withdrawalCode").value.trim();
+    const amount = parseFloat(amountInput.value);
+    const withdrawalCode = codeInput.value.trim();
 
     if (!validateWithdrawalCode(withdrawalCode)) {
       showMessage("Code de retrait incorrect");
@@ -372,20 +382,29 @@
     }
   }
 
+  // 🔑 Auth state
   onAuthStateChanged(auth, (user) => {
     currentUser = user;
+    const button = document.getElementById("withdrawal-button");
     if (user) {
       loadUserData(user.uid);
+      if (button) button.disabled = false;
     } else {
-      document.getElementById("current-balance").textContent = "Non connecté";
+      const balanceEl = document.getElementById("current-balance");
+      if (balanceEl) balanceEl.textContent = "Non connecté";
       showMessage("Connectez-vous pour effectuer un retrait");
-      document.getElementById("withdrawal-button").disabled = true;
+      if (button) button.disabled = true;
     }
   });
 
-  document.getElementById("amount").addEventListener("input", updateWithdrawalSummary);
-  document.getElementById("withdrawalCode").addEventListener("input", updateWithdrawalSummary);
-  document.getElementById("withdrawal-button").addEventListener("click", processWithdrawal);
+  // 🔄 Event listeners
+  const amountInput = document.getElementById("amount");
+  const codeInput = document.getElementById("withdrawalCode");
+  const button = document.getElementById("withdrawal-button");
+
+  if (amountInput) amountInput.addEventListener("input", updateWithdrawalSummary);
+  if (codeInput) codeInput.addEventListener("input", updateWithdrawalSummary);
+  if (button) button.addEventListener("click", processWithdrawal);
 
   showMessage("", false);
 </script>
