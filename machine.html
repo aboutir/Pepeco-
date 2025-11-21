@@ -6,7 +6,7 @@
   <title>Mes VIPs - Investissements</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
   <style>
-    :root {
+      :root {
       --red-bg: #d01818;
       --red-bg-gradient: linear-gradient(135deg, #d01818, #a21010);
       --green: #61B604;
@@ -295,7 +295,6 @@
   </style>
 </head>
 <body>
-
   <header>
     <h1>Suivez votre revenu ici</h1>
     <p>Vous pouvez suivre votre investissement chaque 24/24</p>
@@ -312,49 +311,22 @@
     </div>
   </section>
 
-  <main id="vips-container" aria-live="polite" aria-label="Liste des VIPs investis">
-    <!-- Cartes VIP rendues ici -->
-  </main>
+  <main id="vips-container" aria-live="polite" aria-label="Liste des VIPs investis"></main>
 
   <div class="notification" role="alert" aria-live="assertive"></div>
 
   <nav class="bottom-nav" role="navigation" aria-label="Navigation principale">
     <a href="accueil.html" class="active" aria-current="page">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-      Accueil
-    </a>
-    <a href="appareil.html">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 6H4v12h16V6z"/></svg>
-      Article
-    </a>
-    <a href="equipe.html">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z"/></svg>
-      Équipe
-    </a>
-    <a href="solde.html">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4v-1H8v1c0 2.21 1.79 4 4 4z"/></svg>
-      Moi
-    </a>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg> Accueil
+    </a><a href="appareil.html"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 6H4v12h16V6z"/></svg> Article </a><a href="equipe.html"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z"/></svg> Équipe </a><a href="solde.html"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4v-1H8v1c0 2.21 1.79 4 4 4z"/></svg> Moi </a>
   </nav>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-  import {
-    getAuth,
-    onAuthStateChanged,
-    createUserWithEmailAndPassword,
-    signInWithEmailAndPassword
-  } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-  import {
-    getDatabase,
-    ref,
-    get,
-    set,
-    update,
-    onValue
-  } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+  import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
 
-  // 🔥 Configuration Firebase (PEPECO)
+  // Configuration Firebase
   const firebaseConfig = {
     apiKey: "AIzaSyCaDZQUirunG7CPrMISasgBVlVgkyuISko",
     authDomain: "pepeco-f6f26.firebaseapp.com",
@@ -364,24 +336,25 @@
     messagingSenderId: "175958489677",
     appId: "1:175958489677:web:48b339d732e4207d0f7a04"
   };
-
-  // Initialisation Firebase
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getDatabase(app);
   let currentUser = null;
 
-  // ⚙️ Configuration des articles (VIP)
   const VIP_CONFIG = {
-    1: { nom: "Chaussures", dailyRevenue: 1010, cycleDuration: 21, totalRevenue: 21210, image: "https://image.noelshack.com/fichiers/2025/41/6/1760179383-mocassin-ete-cuir-graine-marron-pour-homme-503br-2.jpg" },
-    2: { nom: "Habille", dailyRevenue: 2510, cycleDuration: 17, totalRevenue: 42670, image: "https://image.noelshack.com/fichiers/2025/41/6/1760179492-nature-morte-chemises-classiques-cintre-23-2150828629.jpg" },
-    3: { nom: "Chapeau", dailyRevenue: 4067, cycleDuration: 17, totalRevenue: 69139, image: "https://image.noelshack.com/fichiers/2025/41/6/1760179668-images-2.jpeg" },
-    5: { nom: "Sac", dailyRevenue: 7090, cycleDuration: 17, totalRevenue: 120530, image: "https://image.noelshack.com/fichiers/2025/41/6/1760179812-whatsappimage2024-02-26at14-05-37-2-1024x1024.jpg" },
-    6: { nom: "Cravate", dailyRevenue: 25580, cycleDuration: 14, totalRevenue: 358120, image: "https://image.noelshack.com/fichiers/2025/41/6/1760179910-une-cravate-sur-le-fond-blanc-17205221.jpg" },
-    7: { nom: "Montre", dailyRevenue: 48100, cycleDuration: 12, totalRevenue: 577200, image: "https://image.noelshack.com/fichiers/2025/41/6/1760180029-550x548.jpg" },
+    1: { nom: "Chaussures", dailyRevenue: 500, dailyPercent: 10, cycleDuration: 10, totalRevenue: 5000, capital: 5000, image: "https://image.noelshack.com/fichiers/2025/41/6/1760179383-mocassin-ete-cuir-graine-marron-pour-homme-503br-2.jpg" },
+    2: { nom: "Habille", dailyRevenue: 1000, dailyPercent: 10, cycleDuration: 10, totalRevenue: 10000, capital: 10000, image: "https://image.noelshack.com/fichiers/2025/41/6/1760179492-nature-morte-chemises-classiques-cintre-23-2150828629.jpg" },
+    3: { nom: "Chapeau", dailyRevenue: 1200, dailyPercent: 8, cycleDuration: 12, totalRevenue: 14400, capital: 15000, image: "https://image.noelshack.com/fichiers/2025/41/6/1760179668-images-2.jpeg" },
+    4: { nom: "Sac", dailyRevenue: 1500, dailyPercent: 7.5, cycleDuration: 14, totalRevenue: 21000, capital: 20000, image: "https://image.noelshack.com/fichiers/2025/41/6/1760179812-whatsappimage2024-02-26at14-05-37-2-1024x1024.jpg" },
+    5: { nom: "Gravatte", dailyRevenue: 2500, dailyPercent: 8, cycleDuration: 12, totalRevenue: 30000, capital: 30000, image: "https://image.noelshack.com/fichiers/2025/41/6/1760179910-une-cravate-sur-le-fond-blanc-17205221.jpg" },
+    6: { nom: "Montre", dailyRevenue: 4000, dailyPercent: 8, cycleDuration: 15, totalRevenue: 60000, capital: 50000, image: "https://image.noelshack.com/fichiers/2025/41/6/1760180029-550x548.jpg" },
+    7: { nom: "Montre de luxe", dailyRevenue: 6000, dailyPercent: 8, cycleDuration: 15, totalRevenue: 90000, capital: 75000, image: "https://image.noelshack.com/fichiers/2025/41/6/1760180029-550x548.jpg" },
+    8: { nom: "Montre très luxe", dailyRevenue: 8000, dailyPercent: 8, cycleDuration: 15, totalRevenue: 120000, capital: 100000, image: "https://image.noelshack.com/fichiers/2025/41/6/1760180029-550x548.jpg" },
+    9: { nom: "Montre ultra luxe", dailyRevenue: 12000, dailyPercent: 8, cycleDuration: 15, totalRevenue: 180000, capital: 150000, image: "https://image.noelshack.com/fichiers/2025/41/6/1760180029-550x548.jpg" },
+    10: { nom: "Montre ultra luxe+", dailyRevenue: 16000, dailyPercent: 8, cycleDuration: 15, totalRevenue: 240000, capital: 200000, image: "https://image.noelshack.com/fichiers/2025/41/6/1760180029-550x548.jpg" },
   };
 
-  // ✅ Fonction pour afficher une notification
+  // Fonction pour afficher notification
   function showNotification(message, type = "info") {
     const notification = document.querySelector('.notification');
     if (!notification) return;
@@ -391,7 +364,7 @@
     setTimeout(() => notification.style.display = 'none', 3000);
   }
 
-  // 📊 Calcul de la progression du cycle
+  // Calcul progression du cycle
   function calculateCycleProgress(investment) {
     const config = VIP_CONFIG[investment.productId];
     if (!config) return { isComplete: true, progress: 100, remainingDays: 0 };
@@ -408,7 +381,7 @@
     };
   }
 
-  // 📅 Vérifie si l'utilisateur peut collecter aujourd’hui
+  // Vérifie si utilisateur peut collecter aujourd’hui
   function isReadyToCollect(investment) {
     const lastCollection = investment.lastCollection || 0;
     const now = new Date();
@@ -420,7 +393,7 @@
     );
   }
 
-  // 📈 Mise à jour des statistiques globales
+  // Met à jour les stats globales
   function updateStats(investments) {
     const totalVips = investments.filter(inv => inv.status === 'active').length;
     const totalRevenueNum = investments.reduce((sum, inv) => sum + (inv.status === 'active' ? (inv.totalCollected || 0) : 0), 0);
@@ -431,7 +404,7 @@
     if (totalRevenueElement) totalRevenueElement.textContent = totalRevenueNum.toLocaleString('fr-FR') + ' FCFA';
   }
 
-  // 🔄 Chargement des articles actifs
+  // Chargement des VIPs
   async function loadVIPs() {
     if (!currentUser) return;
     try {
@@ -459,7 +432,7 @@
     }
   }
 
-  // 🖼️ Affichage des articles (VIP)
+  // Affichage des VIPs
   function renderVIPs(investments) {
     const container = document.getElementById('vips-container');
     if (!container) return;
@@ -482,7 +455,7 @@
             <div class="vip-logo" style="background-image: url('${config.image}');"></div>
             <div>
               <div class="vip-title">${config.nom}</div>
-              <div class="vip-subtitle">${config.dailyRevenue.toLocaleString('fr-FR')} FCFA / jour</div>
+              <div class="vip-subtitle">${config.dailyRevenue.toLocaleString('fr-FR')} FCFA / jour (${config.dailyPercent}%)</div>
             </div>
           </div>
           <div class="vip-details">
@@ -494,6 +467,8 @@
             <div class="progress-header"><span>Progression</span><span>${progress}%</span></div>
             <div class="progress-bar"><div class="progress-fill" style="width: ${progress}%"></div></div>
           </div>
+          <div class="capital-rembourse">+ Le capital investi est remboursé à la fin du cycle ${config.capital.toLocaleString('fr-FR')}F</div>
+          <div class="service-client">Après la fin du cycle, veuillez écrire au service client Pepco pour réclamer votre capital.</div>
           <button class="collect-btn" 
                   onclick="window.collectRevenue('${investment.id}')" 
                   ${(!canCollect || isComplete) ? 'disabled' : ''}>
@@ -504,7 +479,7 @@
     }).join('');
   }
 
-  // 💰 Fonction de collecte des revenus journaliers
+  // Collecte des revenus journaliers
   window.collectRevenue = async function (investmentId) {
     if (!currentUser) return showNotification("Veuillez vous connecter", "error");
 
@@ -542,28 +517,19 @@
     }
   };
 
-  // 👤 Suivi de l’état de connexion
   onAuthStateChanged(auth, (user) => {
     if (user) {
       currentUser = user;
       loadVIPs();
-      onValue(ref(db, `investments/${user.uid}`), () => loadVIPs());
+      // Surveille en temps réel les investissements
+      const investRef = ref(db, `investments/${user.uid}`);
+      get(investRef).then(() => loadVIPs());
     } else {
+      currentUser = null;
       window.location.href = 'login.html';
     }
   });
 
-  // ⚠️ Gestion des erreurs globales
-  window.addEventListener('error', (e) => {
-    console.error('Erreur globale:', e);
-    showNotification('Erreur inattendue', "error");
-  });
-
-  window.addEventListener('unhandledrejection', (e) => {
-    console.error('Erreur promesse:', e.reason);
-    showNotification('Erreur inattendue', "error");
-    e.preventDefault();
-  });
 </script>
 
 </body>
