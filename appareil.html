@@ -82,6 +82,19 @@
       font-size: 15px;
       color: #333;
     }
+    .capital-rembourse {
+      color: #a21010;
+      font-weight: 700;
+      font-size: 14px;
+      margin-top: 6px;
+      font-style: italic;
+    }
+    .service-client {
+      color: #a21010;
+      font-size: 13px;
+      margin-top: 4px;
+      font-style: italic;
+    }
     .acheter-btn {
       background-color: var(--green);
       border: none;
@@ -145,139 +158,174 @@
       height: 24px;
       fill: currentColor;
     }
-    /* Instruction pour le lock notice */
-    .lock-notice {
-      margin-top: 10px;
-      font-size: 14px;
-      color: #d01818;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .lock-notice p {
-      margin: 0;
-      font-size: 13px;
-      color: #a21010;
-    }
   </style>
 </head>
 <body>
 
-  <div class="offre">
-    <img src="https://image.noelshack.com/fichiers/2025/41/6/1760179383-mocassin-ete-cuir-graine-marron-pour-homme-503br-2.jpg" alt="Omni One VR1" />
-    <div class="details-container">
-      <h2 class="nom-offre">Chaussures</h2>
-      <div class="prix">FCFA 5,500</div>
-      <div class="details"><span>Durée :</span><span>21 jours</span></div>
-      <div class="details"><span>Gain par jours :</span><span>FCFA 1,010</span></div>
-      <div class="details"><span>Revenus total :</span><span>FCFA 21,210</span></div>
-      <button class="acheter-btn buy-button" data-product-id="1" data-price="5500">Investir maintenant</button>
-    </div>
+<div class="offre">
+  <img src="https://image.noelshack.com/fichiers/2025/41/6/1760179383-mocassin-ete-cuir-graine-marron-pour-homme-503br-2.jpg" alt="Chaussures" />
+  <div class="details-container">
+    <h2 class="nom-offre">Chaussures</h2>
+    <div class="prix">FCFA 5,000</div>
+    <div class="details"><span>Durée :</span><span>10 jours</span></div>
+    <div class="details"><span>Gain par jours :</span><span>FCFA 500 (10%)</span></div>
+    <div class="details"><span>Revenus total :</span><span>FCFA 5,000</span></div>
+    <div class="capital-rembourse">+ Le capital investi est remboursé à la fin du cycle 5 000F</div>
+    <div class="service-client">Après la fin du cycle, veuillez écrire au service client Pepco pour réclamer votre capital.</div>
+    <button class="acheter-btn buy-button" data-product-id="1" data-price="5000">Investir maintenant</button>
   </div>
+</div>
 
-  <div class="offre">
-    <img src="https://image.noelshack.com/fichiers/2025/41/6/1760179492-nature-morte-chemises-classiques-cintre-23-2150828629.jpg" alt="Omni One VR2" />
-    <div class="details-container">
-      <h2 class="nom-offre">Habille</h2>
-      <div class="prix">FCFA 10,500</div>
-      <div class="details"><span>Durée :</span><span>17 jours</span></div>
-      <div class="details"><span>Gain par jours :</span><span>FCFA 2,510</span></div>
-      <div class="details"><span>Revenus total :</span><span>FCFA 42,670</span></div>
-      <button class="acheter-btn buy-button" data-product-id="2" data-price="10500">Investir maintenant</button>
-    </div>
+<div class="offre">
+  <img src="https://image.noelshack.com/fichiers/2025/41/6/1760179492-nature-morte-chemises-classiques-cintre-23-2150828629.jpg" alt="Habille" />
+  <div class="details-container">
+    <h2 class="nom-offre">Habille</h2>
+    <div class="prix">FCFA 10,000</div>
+    <div class="details"><span>Durée :</span><span>10 jours</span></div>
+    <div class="details"><span>Gain par jours :</span><span>FCFA 1,000 (10%)</span></div>
+    <div class="details"><span>Revenus total :</span><span>FCFA 10,000</span></div>
+    <div class="capital-rembourse">+ Le capital investi est remboursé à la fin du cycle 10 000F</div>
+    <div class="service-client">Après la fin du cycle, veuillez écrire au service client Pepco pour réclamer votre capital.</div>
+    <button class="acheter-btn buy-button" data-product-id="2" data-price="10000">Investir maintenant</button>
   </div>
+</div>
 
-  <div class="offre">
-    <img src="https://image.noelshack.com/fichiers/2025/41/6/1760179668-images-2.jpeg" alt="Omni One VR3" />
-    <div class="details-container">
-      <h2 class="nom-offre">Chapeau</h2>
-      <div class="prix">FCFA 18,000</div>
-      <div class="details"><span>Durée :</span><span>17 jours</span></div>
-      <div class="details"><span>Gain par jours :</span><span>FCFA 4,067</span></div>
-      <div class="details"><span>Revenus total :</span><span>FCFA 69,139</span></div>
-      <button class="acheter-btn buy-button" data-product-id="3" data-price="18000">Investir maintenant</button>
-    </div>
+<div class="offre">
+  <img src="https://image.noelshack.com/fichiers/2025/41/6/1760179668-images-2.jpeg" alt="Chapeau" />
+  <div class="details-container">
+    <h2 class="nom-offre">Chapeau</h2>
+    <div class="prix">FCFA 15,000</div>
+    <div class="details"><span>Durée :</span><span>12 jours</span></div>
+    <div class="details"><span>Gain par jours :</span><span>FCFA 1,200 (8%)</span></div>
+    <div class="details"><span>Revenus total :</span><span>FCFA 14,400</span></div>
+    <div class="capital-rembourse">+ Le capital investi est remboursé à la fin du cycle 15 000F</div>
+    <div class="service-client">Après la fin du cycle, veuillez écrire au service client Pepco pour réclamer votre capital.</div>
+    <button class="acheter-btn buy-button" data-product-id="3" data-price="15000">Investir maintenant</button>
   </div>
+</div>
 
-  <div class="offre">
-    <img src="https://image.noelshack.com/fichiers/2025/41/6/1760179812-whatsappimage2024-02-26at14-05-37-2-1024x1024.jpg" alt="Omni One VR4" />
-    <div class="details-container">
-      <h2 class="nom-offre">Sac</h2>
-      <div class="prix">FCFA 35,000</div>
-      <div class="details"><span>Durée :</span><span>17 jours</span></div>
-      <div class="details"><span>Gain par jours :</span><span>FCFA 7,090</span></div>
-      <div class="details"><span>Revenus total :</span><span>FCFA 120,530</span></div>
-      <button class="acheter-btn buy-button" data-product-id="5" data-price="35000">Investir maintenant</button>
-    </div>
+<div class="offre">
+  <img src="https://image.noelshack.com/fichiers/2025/41/6/1760179812-whatsappimage2024-02-26at14-05-37-2-1024x1024.jpg" alt="Sac" />
+  <div class="details-container">
+    <h2 class="nom-offre">Sac</h2>
+    <div class="prix">FCFA 20,000</div>
+    <div class="details"><span>Durée :</span><span>14 jours</span></div>
+    <div class="details"><span>Gain par jours :</span><span>FCFA 1,500 (7.5%)</span></div>
+    <div class="details"><span>Revenus total :</span><span>FCFA 21,000</span></div>
+    <div class="capital-rembourse">+ Le capital investi est remboursé à la fin du cycle 20 000F</div>
+    <div class="service-client">Après la fin du cycle, veuillez écrire au service client Pepco pour réclamer votre capital.</div>
+    <button class="acheter-btn buy-button" data-product-id="4" data-price="20000">Investir maintenant</button>
   </div>
+</div>
 
-  <div class="offre">
-    <img src="https://image.noelshack.com/fichiers/2025/41/6/1760179910-une-cravate-sur-le-fond-blanc-17205221.jpg" alt="Omni One VR5" />
-    <div class="details-container">
-      <h2 class="nom-offre">Gravatte</h2>
-      <div class="prix">FCFA 100,000</div>
-      <div class="details"><span>Durée :</span><span>14 jours</span></div>
-      <div class="details"><span>Gain par jours :</span><span>FCFA 25,580</span></div>
-      <div class="details"><span>Revenus total :</span><span>FCFA 358,120</span></div>
-      <button class="acheter-btn buy-button" data-product-id="6" data-price="100000">Investir maintenant</button>
-    </div>
+<div class="offre">
+  <img src="https://image.noelshack.com/fichiers/2025/41/6/1760179910-une-cravate-sur-le-fond-blanc-17205221.jpg" alt="Gravatte" />
+  <div class="details-container">
+    <h2 class="nom-offre">Gravatte</h2>
+    <div class="prix">FCFA 30,000</div>
+    <div class="details"><span>Durée :</span><span>12 jours</span></div>
+    <div class="details"><span>Gain par jours :</span><span>FCFA 2,500 (8%)</span></div>
+    <div class="details"><span>Revenus total :</span><span>FCFA 30,000</span></div>
+    <div class="capital-rembourse">+ Le capital investi est remboursé à la fin du cycle 30 000F</div>
+    <div class="service-client">Après la fin du cycle, veuillez écrire au service client Pepco pour réclamer votre capital.</div>
+    <button class="acheter-btn buy-button" data-product-id="5" data-price="30000">Investir maintenant</button>
   </div>
+</div>
 
-  <div class="offre">
-    <img src="https://image.noelshack.com/fichiers/2025/41/6/1760180029-550x548.jpg" alt="Omni One VR6" />
-    <div class="details-container">
-      <h2 class="nom-offre">Montre</h2>
-      <div class="prix">FCFA 200,000</div>
-      <div class="details"><span>Durée :</span><span>12 jours</span></div>
-      <div class="details"><span>Gain par jours :</span><span>FCFA 48,100</span></div>
-      <div class="details"><span>Revenus total :</span><span>FCFA 577,200</span></div>
-      <button class="acheter-btn buy-button" data-product-id="7" data-price="200000">Investir maintenant</button>
-    </div>
+<div class="offre">
+  <img src="https://image.noelshack.com/fichiers/2025/41/6/1760180029-550x548.jpg" alt="Montre" />
+  <div class="details-container">
+    <h2 class="nom-offre">Montre</h2>
+    <div class="prix">FCFA 50,000</div>
+    <div class="details"><span>Durée :</span><span>15 jours</span></div>
+    <div class="details"><span>Gain par jours :</span><span>FCFA 4,000 (8%)</span></div>
+    <div class="details"><span>Revenus total :</span><span>FCFA 60,000</span></div>
+    <div class="capital-rembourse">+ Le capital investi est remboursé à la fin du cycle 50 000F</div>
+    <div class="service-client">Après la fin du cycle, veuillez écrire au service client Pepco pour réclamer votre capital.</div>
+    <button class="acheter-btn buy-button" data-product-id="6" data-price="50000">Investir maintenant</button>
   </div>
+</div>
 
-  <nav class="bottom-nav" role="navigation" aria-label="Navigation principale">
-    <a href="accueil.html" class="active" aria-current="page">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-      Accueil
-    </a>
-    <a href="appareil.html">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 6H4v12h16V6z"/></svg>
-      Article 
-    </a>
-    <a href="equipe.html">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z"/></svg>
-      Équipe
-    </a>
-    <a href="solde.html">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4v-1H8v1c0 2.21 1.79 4 4 4z"/></svg>
-      Moi
-    </a>
-  </nav>
+<div class="offre">
+  <img src="https://image.noelshack.com/fichiers/2025/41/6/1760180029-550x548.jpg" alt="Montre de luxe" />
+  <div class="details-container">
+    <h2 class="nom-offre">Montre de luxe</h2>
+    <div class="prix">FCFA 75,000</div>
+    <div class="details"><span>Durée :</span><span>15 jours</span></div>
+    <div class="details"><span>Gain par jours :</span><span>FCFA 6,000 (8%)</span></div>
+    <div class="details"><span>Revenus total :</span><span>FCFA 90,000</span></div>
+    <div class="capital-rembourse">+ Le capital investi est remboursé à la fin du cycle 75 000F</div>
+    <div class="service-client">Après la fin du cycle, veuillez écrire au service client Pepco pour réclamer votre capital.</div>
+    <button class="acheter-btn buy-button" data-product-id="7" data-price="75000">Investir maintenant</button>
+  </div>
+</div>
 
-  <!-- Intégration du script Firebase -->
+<div class="offre">
+  <img src="https://image.noelshack.com/fichiers/2025/41/6/1760180029-550x548.jpg" alt="Montre très luxe" />
+  <div class="details-container">
+    <h2 class="nom-offre">Montre très luxe</h2>
+    <div class="prix">FCFA 100,000</div>
+    <div class="details"><span>Durée :</span><span>15 jours</span></div>
+    <div class="details"><span>Gain par jours :</span><span>FCFA 8,000 (8%)</span></div>
+    <div class="details"><span>Revenus total :</span><span>FCFA 120,000</span></div>
+    <div class="capital-rembourse">+ Le capital investi est remboursé à la fin du cycle 100 000F</div>
+    <div class="service-client">Après la fin du cycle, veuillez écrire au service client Pepco pour réclamer votre capital.</div>
+    <button class="acheter-btn buy-button" data-product-id="8" data-price="100000">Investir maintenant</button>
+  </div>
+</div>
+
+<div class="offre">
+  <img src="https://image.noelshack.com/fichiers/2025/41/6/1760180029-550x548.jpg" alt="Montre ultra luxe" />
+  <div class="details-container">
+    <h2 class="nom-offre">Montre ultra luxe</h2>
+    <div class="prix">FCFA 150,000</div>
+    <div class="details"><span>Durée :</span><span>15 jours</span></div>
+    <div class="details"><span>Gain par jours :</span><span>FCFA 12,000 (8%)</span></div>
+    <div class="details"><span>Revenus total :</span><span>FCFA 180,000</span></div>
+    <div class="capital-rembourse">+ Le capital investi est remboursé à la fin du cycle 150 000F</div>
+    <div class="service-client">Après la fin du cycle, veuillez écrire au service client Pepco pour réclamer votre capital.</div>
+    <button class="acheter-btn buy-button" data-product-id="9" data-price="150000">Investir maintenant</button>
+  </div>
+</div>
+
+<div class="offre">
+  <img src="https://image.noelshack.com/fichiers/2025/41/6/1760180029-550x548.jpg" alt="Montre ultra luxe+" />
+  <div class="details-container">
+    <h2 class="nom-offre">Montre ultra luxe+</h2>
+    <div class="prix">FCFA 200,000</div>
+    <div class="details"><span>Durée :</span><span>15 jours</span></div>
+    <div class="details"><span>Gain par jours :</span><span>FCFA 16,000 (8%)</span></div>
+    <div class="details"><span>Revenus total :</span><span>FCFA 240,000</span></div>
+    <div class="capital-rembourse">+ Le capital investi est remboursé à la fin du cycle 200 000F</div>
+    <div class="service-client">Après la fin du cycle, veuillez écrire au service client Pepco pour réclamer votre capital.</div>
+    <button class="acheter-btn buy-button" data-product-id="10" data-price="200000">Investir maintenant</button>
+  </div>
+</div>
+
+<nav class="bottom-nav" role="navigation" aria-label="Navigation principale">
+  <a href="accueil.html" class="active" aria-current="page">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+    Accueil
+  </a>
+  <a href="appareil.html">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 6H4v12h16V6z"/></svg>
+    Article 
+  </a>
+  <a href="equipe.html">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z"/></svg>
+    Équipe
+  </a>
+  <a href="solde.html">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4v-1H8v1c0 2.21 1.79 4 4 4z"/></svg>
+    Moi
+  </a>
+</nav>
+
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-  import {
-    getAuth,
-    onAuthStateChanged,
-    createUserWithEmailAndPassword,
-    signInWithEmailAndPassword
-  } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-  import {
-    getDatabase,
-    ref,
-    get,
-    set,
-    update,
-    onValue,
-    runTransaction,
-    query,
-    orderByChild,
-    equalTo,
-    push
-  } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+  import { getDatabase, ref, get, update, push } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
 
-  // 🔥 Configuration Firebase (PEPECO)
   const firebaseConfig = {
     apiKey: "AIzaSyCaDZQUirunG7CPrMISasgBVlVgkyuISko",
     authDomain: "pepeco-f6f26.firebaseapp.com",
@@ -285,9 +333,8 @@
     projectId: "pepeco-f6f26",
     storageBucket: "pepeco-f6f26.firebasestorage.app",
     messagingSenderId: "175958489677",
-    appId: "1:175958489677:web:48b339d732e4207d0f7a04"
+    appId: "1:175958489677:web:48b339d732e4207a04"
   };
-  
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
@@ -296,20 +343,24 @@
   let currentUser = null;
   let userBalance = 0;
 
-  // Strictement utilisé pour limiter à 1 achat par produit
+  // Limites : un achat par produit
   const PRODUCT_LIMITS = {
     1: 1,
     2: 1,
     3: 1,
+    4: 1,
     5: 1,
     6: 1,
     7: 1,
+    8: 1,
+    9: 1,
+    10: 1,
   };
 
   function showNotification(message, type) {
     const notification = document.querySelector('.notification');
     if (!notification) {
-      alert(message); // fallback
+      alert(message);
       return;
     }
     notification.textContent = message;
@@ -378,29 +429,24 @@
     }
 
     try {
-      // Trouver le conteneur .offre correspondant au produit cliqué via data-product-id
       const offerElement = document.querySelector(`.buy-button[data-product-id="${productId}"]`).closest('.offre');
       if (!offerElement) {
         showNotification("Offre introuvable", "error");
         return;
       }
 
-      // Extraire les données depuis le HTML affiché
-      // Durée (en jours)
       const dureeEl = Array.from(offerElement.querySelectorAll('.details span')).find(el => el.textContent.trim() === 'Durée :');
       let duree = null;
       if (dureeEl) {
         const dureeText = dureeEl.nextElementSibling.textContent.trim();
         duree = parseInt(dureeText, 10);
       }
-      // Gain par jour
       const gainEl = Array.from(offerElement.querySelectorAll('.details span')).find(el => el.textContent.trim() === 'Gain par jours :');
       let dailyRevenue = null;
       if (gainEl) {
-        const gainText = gainEl.nextElementSibling.textContent.trim(); // Ex: "FCFA 380"
+        const gainText = gainEl.nextElementSibling.textContent.trim();
         dailyRevenue = parseInt(gainText.replace(/[^0-9]/g, ''), 10);
       }
-      // Revenu total
       const revenuEl = Array.from(offerElement.querySelectorAll('.details span')).find(el => el.textContent.trim() === 'Revenus total :');
       let totalRevenue = null;
       if (revenuEl) {
@@ -413,7 +459,6 @@
         return;
       }
 
-      // Vérifier la limite d'investissement
       const activeInvestments = await checkActiveInvestments(currentUser.uid, Number(productId));
       if (activeInvestments >= PRODUCT_LIMITS[productId]) {
         showNotification("Vous avez atteint la limite d'achat pour ce produit", "error");
