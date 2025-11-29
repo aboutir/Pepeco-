@@ -204,9 +204,7 @@
       transition: width 1s ease-in-out;
       box-shadow: 0 0 6px var(--green);
     }
-    /* Les boutons ne sont pas modifiés comme demandé */
 
-    /* Notification */
     .notification {
       position: fixed;
       top: 20px;
@@ -228,7 +226,6 @@
       background-color: #ef4444;
     }
 
-    /* Bottom nav fixe */
     nav.bottom-nav {
       position: fixed;
       bottom: 0;
@@ -271,7 +268,7 @@
       height: 24px;
       fill: currentColor;
     }
-    /* Responsive */
+
     @media (max-width: 400px) {
       #vips-container {
         grid-template-columns: 1fr;
@@ -326,7 +323,6 @@
   import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
   import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
 
-  // Configuration Firebase
   const firebaseConfig = {
     apiKey: "AIzaSyCaDZQUirunG7CPrMISasgBVlVgkyuISko",
     authDomain: "pepeco-f6f26.firebaseapp.com",
@@ -342,19 +338,13 @@
   let currentUser = null;
 
   const VIP_CONFIG = {
-    1: { nom: "Chaussures", dailyRevenue: 500, dailyPercent: 10, cycleDuration: 10, totalRevenue: 5000, capital: 5000, image: "https://image.noelshack.com/fichiers/2025/41/6/1760179383-mocassin-ete-cuir-graine-marron-pour-homme-503br-2.jpg" },
-    2: { nom: "Habille", dailyRevenue: 1000, dailyPercent: 10, cycleDuration: 10, totalRevenue: 10000, capital: 10000, image: "https://image.noelshack.com/fichiers/2025/41/6/1760179492-nature-morte-chemises-classiques-cintre-23-2150828629.jpg" },
-    3: { nom: "Chapeau", dailyRevenue: 1200, dailyPercent: 8, cycleDuration: 12, totalRevenue: 14400, capital: 15000, image: "https://image.noelshack.com/fichiers/2025/41/6/1760179668-images-2.jpeg" },
-    4: { nom: "Sac", dailyRevenue: 1500, dailyPercent: 7.5, cycleDuration: 14, totalRevenue: 21000, capital: 20000, image: "https://image.noelshack.com/fichiers/2025/41/6/1760179812-whatsappimage2024-02-26at14-05-37-2-1024x1024.jpg" },
-    5: { nom: "Gravatte", dailyRevenue: 2500, dailyPercent: 8, cycleDuration: 12, totalRevenue: 30000, capital: 30000, image: "https://image.noelshack.com/fichiers/2025/41/6/1760179910-une-cravate-sur-le-fond-blanc-17205221.jpg" },
-    6: { nom: "Montre", dailyRevenue: 4000, dailyPercent: 8, cycleDuration: 15, totalRevenue: 60000, capital: 50000, image: "https://image.noelshack.com/fichiers/2025/41/6/1760180029-550x548.jpg" },
-    7: { nom: "Montre de luxe", dailyRevenue: 6000, dailyPercent: 8, cycleDuration: 15, totalRevenue: 90000, capital: 75000, image: "https://image.noelshack.com/fichiers/2025/41/6/1760180029-550x548.jpg" },
-    8: { nom: "Montre très luxe", dailyRevenue: 8000, dailyPercent: 8, cycleDuration: 15, totalRevenue: 120000, capital: 100000, image: "https://image.noelshack.com/fichiers/2025/41/6/1760180029-550x548.jpg" },
-    9: { nom: "Montre ultra luxe", dailyRevenue: 12000, dailyPercent: 8, cycleDuration: 15, totalRevenue: 180000, capital: 150000, image: "https://image.noelshack.com/fichiers/2025/41/6/1760180029-550x548.jpg" },
-    10: { nom: "Montre ultra luxe+", dailyRevenue: 16000, dailyPercent: 8, cycleDuration: 15, totalRevenue: 240000, capital: 200000, image: "https://image.noelshack.com/fichiers/2025/41/6/1760180029-550x548.jpg" },
+    1: { nom: "VIP 1", dailyRevenue: 1400, dailyPercent: 28, cycleDuration: 31, totalRevenue: 43400, capital: 5000, image: "https://image.noelshack.com/fichiers/2025/41/6/1760179383-mocassin-ete-cuir-graine-marron-pour-homme-503br-2.jpg" },
+    2: { nom: "VIP 2", dailyRevenue: 2400, dailyPercent: 24, cycleDuration: 31, totalRevenue: 74400, capital: 10000, image: "https://image.noelshack.com/fichiers/2025/41/6/1760179492-nature-morte-chemises-classiques-cintre-23-2150828629.jpg" },
+    3: { nom: "VIP 3", dailyRevenue: 3400, dailyPercent: 17, cycleDuration: 31, totalRevenue: 105400, capital: 20000, image: "https://image.noelshack.com/fichiers/2025/41/6/1760179668-images-2.jpeg" },
+    4: { nom: "VIP 4", dailyRevenue: 4400, dailyPercent: 14.67, cycleDuration: 31, totalRevenue: 136400, capital: 30000, image: "https://image.noelshack.com/fichiers/2025/41/6/1760179812-whatsappimage2024-02-26at14-05-37-2-1024x1024.jpg" },
+    5: { nom: "VIP 5", dailyRevenue: 6400, dailyPercent: 12.8, cycleDuration: 31, totalRevenue: 198400, capital: 50000, image: "https://image.noelshack.com/fichiers/2025/41/6/1760179910-une-cravate-sur-le-fond-blanc-17205221.jpg" }
   };
 
-  // Fonction pour afficher notification
   function showNotification(message, type = "info") {
     const notification = document.querySelector('.notification');
     if (!notification) return;
@@ -364,7 +354,6 @@
     setTimeout(() => notification.style.display = 'none', 3000);
   }
 
-  // Calcul progression du cycle
   function calculateCycleProgress(investment) {
     const config = VIP_CONFIG[investment.productId];
     if (!config) return { isComplete: true, progress: 100, remainingDays: 0 };
@@ -381,7 +370,6 @@
     };
   }
 
-  // Vérifie si utilisateur peut collecter aujourd’hui
   function isReadyToCollect(investment) {
     const lastCollection = investment.lastCollection || 0;
     const now = new Date();
@@ -393,7 +381,6 @@
     );
   }
 
-  // Met à jour les stats globales
   function updateStats(investments) {
     const totalVips = investments.filter(inv => inv.status === 'active').length;
     const totalRevenueNum = investments.reduce((sum, inv) => sum + (inv.status === 'active' ? (inv.totalCollected || 0) : 0), 0);
@@ -404,7 +391,6 @@
     if (totalRevenueElement) totalRevenueElement.textContent = totalRevenueNum.toLocaleString('fr-FR') + ' FCFA';
   }
 
-  // Chargement des VIPs
   async function loadVIPs() {
     if (!currentUser) return;
     try {
@@ -432,7 +418,6 @@
     }
   }
 
-  // Affichage des VIPs
   function renderVIPs(investments) {
     const container = document.getElementById('vips-container');
     if (!container) return;
@@ -479,7 +464,6 @@
     }).join('');
   }
 
-  // Collecte des revenus journaliers
   window.collectRevenue = async function (investmentId) {
     if (!currentUser) return showNotification("Veuillez vous connecter", "error");
 
@@ -521,7 +505,6 @@
     if (user) {
       currentUser = user;
       loadVIPs();
-      // Surveille en temps réel les investissements
       const investRef = ref(db, `investments/${user.uid}`);
       get(investRef).then(() => loadVIPs());
     } else {
@@ -529,8 +512,6 @@
       window.location.href = 'login.html';
     }
   });
-
 </script>
-
 </body>
 </html>
